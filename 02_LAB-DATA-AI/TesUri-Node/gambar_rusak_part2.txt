@@ -1,3 +1,289 @@
-Daftar Makanan yang MASIH GAGAL ditarik dari Google:
+Daftar Makanan yang BENAR-BENAR KOSONG FOTONYA DI GOOGLE:
 
-1. Alpukat segar - Tidak ada foto yang pas di Google
+1. Alpukat segar - Tidak ditemukan foto aslinya
+2. Anak sapi daging sedang segar - Tidak ditemukan foto aslinya
+3. Apel malang segar - Tidak ditemukan foto aslinya
+4. Arwan sirsir - Tidak ditemukan foto aslinya
+5. Babi ginjal segar - Tidak ditemukan foto aslinya
+6. Bagea kenari asin - Tidak ditemukan foto aslinya
+7. Batang Tading - Tidak ditemukan foto aslinya
+8. Batatas kelapa ubi segar - Tidak ditemukan foto aslinya
+9. Bayam tumis + oncom - Tidak ditemukan foto aslinya
+10. Bayam tumis bersantan - Tidak ditemukan foto aslinya
+11. Beef burger - Tidak ditemukan foto aslinya
+12. Beef teriyaki masakan - Tidak ditemukan foto aslinya
+13. Bekasang - Tidak ditemukan foto aslinya
+14. Belibis daging segar - Tidak ditemukan foto aslinya
+15. Belutlaut segar - Tidak ditemukan foto aslinya
+16. Bengkuang - Tidak ditemukan foto aslinya
+17. Bentul talas kukus - Tidak ditemukan foto aslinya
+18. Beras ganyong - Tidak ditemukan foto aslinya
+19. Beras giling var rojolele mentah - Tidak ditemukan foto aslinya
+20. Beras jagung kuning kering mentah - Tidak ditemukan foto aslinya
+21. Beras Ketan Hitam tumbuk - Tidak ditemukan foto aslinya
+22. Beras ketan putih tumbuk mentah - Tidak ditemukan foto aslinya
+23. Beras Menir - Tidak ditemukan foto aslinya
+24. Beras Merah tumbuk - Tidak ditemukan foto aslinya
+25. Beras Pecah Kulit - Tidak ditemukan foto aslinya
+26. Beras Siger - Tidak ditemukan foto aslinya
+27. Bihun - Tidak ditemukan foto aslinya
+28. "Bihun Goreng " - Tidak ditemukan foto aslinya
+29. Bihun Jagung mentah - Tidak ditemukan foto aslinya
+30. Biji Jambu Mete goreng - Tidak ditemukan foto aslinya
+31. "Bika Ambon " - Tidak ditemukan foto aslinya
+32. Biwah segar - Tidak ditemukan foto aslinya
+33. Bonggol Pisang kering - Tidak ditemukan foto aslinya
+34. Botok lamtoro - Tidak ditemukan foto aslinya
+35. Buah Atung - Tidak ditemukan foto aslinya
+36. Buah kom segar - Tidak ditemukan foto aslinya
+37. Buah Nona - Tidak ditemukan foto aslinya
+38. Buah rotan segar - Tidak ditemukan foto aslinya
+39. Bulung Sangu - Tidak ditemukan foto aslinya
+40. Buncis - Tidak ditemukan foto aslinya
+41. Bungkil Biji Karet - Tidak ditemukan foto aslinya
+42. "Buras " - Tidak ditemukan foto aslinya
+43. Coklat bubuk - Tidak ditemukan foto aslinya
+44. "Combro " - Tidak ditemukan foto aslinya
+45. Coto mangkasara kuda masakan - Tidak ditemukan foto aslinya
+46. Cumi - Tidak ditemukan foto aslinya
+47. Daun Gandaria - Tidak ditemukan foto aslinya
+48. Daun kasbi/singkong karet segar - Tidak ditemukan foto aslinya
+49. Daun Katuk - Tidak ditemukan foto aslinya
+50. Daun kenikir segar - Tidak ditemukan foto aslinya
+51. Daun Kumak - Tidak ditemukan foto aslinya
+52. Daun Leunca - Tidak ditemukan foto aslinya
+53. Daun Lobak - Tidak ditemukan foto aslinya
+54. Daun ndusuk segar - Tidak ditemukan foto aslinya
+55. Daun paku segar - Tidak ditemukan foto aslinya
+56. Daun simpur segar - Tidak ditemukan foto aslinya
+57. Daun talas rebus - Tidak ditemukan foto aslinya
+58. Daun talas segar - Tidak ditemukan foto aslinya
+59. Daun Tales rebus - Tidak ditemukan foto aslinya
+60. Daun Ubi Jalar kukus - Tidak ditemukan foto aslinya
+61. Daun ubi tinta segar - Tidak ditemukan foto aslinya
+62. Dendeng belut goreng - Tidak ditemukan foto aslinya
+63. Dideh darah sapi - Tidak ditemukan foto aslinya
+64. Dodol kedondong - Tidak ditemukan foto aslinya
+65. Dodol manado - Tidak ditemukan foto aslinya
+66. Duku - Tidak ditemukan foto aslinya
+67. Duwet segar - Tidak ditemukan foto aslinya
+68. Embacang - Tidak ditemukan foto aslinya
+69. Empal (daging) Goreng masakan - Tidak ditemukan foto aslinya
+70. Emping komak - Tidak ditemukan foto aslinya
+71. Encung asam segar - Tidak ditemukan foto aslinya
+72. "Es Mambo " - Tidak ditemukan foto aslinya
+73. "Es Sirup " - Tidak ditemukan foto aslinya
+74. Gado - Tidak ditemukan foto aslinya
+75. Gadung ubi segar - Tidak ditemukan foto aslinya
+76. Gambas lodeh - Tidak ditemukan foto aslinya
+77. Geplak - Tidak ditemukan foto aslinya
+78. Ginjal Babi - Tidak ditemukan foto aslinya
+79. Gula Kelapa - Tidak ditemukan foto aslinya
+80. Gula Merah Tebu belum dimurnikan - Tidak ditemukan foto aslinya
+81. Gulai ikan masakan - Tidak ditemukan foto aslinya
+82. Gulai kambing - Tidak ditemukan foto aslinya
+83. Gulai pliek - Tidak ditemukan foto aslinya
+84. Hati Sapi - Tidak ditemukan foto aslinya
+85. Hofa/Ubi hutan segar - Tidak ditemukan foto aslinya
+86. Ikan asar merah masakan - Tidak ditemukan foto aslinya
+87. Ikan Asin kering - Tidak ditemukan foto aslinya
+88. Ikan bambangan segar - Tidak ditemukan foto aslinya
+89. Ikan banjar segar - Tidak ditemukan foto aslinya
+90. Ikan baronang segar - Tidak ditemukan foto aslinya
+91. Ikan Bekasang - Tidak ditemukan foto aslinya
+92. Ikan Belut Segar goreng - Tidak ditemukan foto aslinya
+93. Ikan Beunteur - Tidak ditemukan foto aslinya
+94. Ikan biawan segar - Tidak ditemukan foto aslinya
+95. Ikan calo/ peda mentah - Tidak ditemukan foto aslinya
+96. Ikan kakatua segar - Tidak ditemukan foto aslinya
+97. Ikan kawalinya segar - Tidak ditemukan foto aslinya
+98. Ikan Layang - Tidak ditemukan foto aslinya
+99. Ikan layur segar - Tidak ditemukan foto aslinya
+100. Ikan Lele goreng - Tidak ditemukan foto aslinya
+101. Ikan Lemuru - Tidak ditemukan foto aslinya
+102. Ikan malalugis segar - Tidak ditemukan foto aslinya
+103. Ikan Mujair goreng - Tidak ditemukan foto aslinya
+104. Ikan Mujair pepes - Tidak ditemukan foto aslinya
+105. Ikan Mujair segar - Tidak ditemukan foto aslinya
+106. Ikan papuyu/ betok segar - Tidak ditemukan foto aslinya
+107. Ikan Pindang selar mentah - Tidak ditemukan foto aslinya
+108. Ikan selar segar - Tidak ditemukan foto aslinya
+109. Ikan sidat segar - Tidak ditemukan foto aslinya
+110. Ikan sunu asin mentah - Tidak ditemukan foto aslinya
+111. Ikan tempahas segar - Tidak ditemukan foto aslinya
+112. Ikan Teri Nasi kering - Tidak ditemukan foto aslinya
+113. Ikan Teri tepung - Tidak ditemukan foto aslinya
+114. Ikan titang segar - Tidak ditemukan foto aslinya
+115. Jagung pipil var. harapan kering - Tidak ditemukan foto aslinya
+116. "Jagung Sayur (tumis) " - Tidak ditemukan foto aslinya
+117. Jagung titi - Tidak ditemukan foto aslinya
+118. Jali - Tidak ditemukan foto aslinya
+119. Jam selai - Tidak ditemukan foto aslinya
+120. Jambu Air - Tidak ditemukan foto aslinya
+121. Jampang huma mentah - Tidak ditemukan foto aslinya
+122. "Jenang " - Tidak ditemukan foto aslinya
+123. Jeruk Garut - Tidak ditemukan foto aslinya
+124. Jukku pallu kaloa masakan - Tidak ditemukan foto aslinya
+125. Kacang ercis segar - Tidak ditemukan foto aslinya
+126. Kacang goyang - Tidak ditemukan foto aslinya
+127. Kacang Gude muda - Tidak ditemukan foto aslinya
+128. Kacang hitam kering - Tidak ditemukan foto aslinya
+129. Kacang Kapri muda - Tidak ditemukan foto aslinya
+130. Kacang kedelai segar - Tidak ditemukan foto aslinya
+131. Kacang komak segar - Tidak ditemukan foto aslinya
+132. Kacang kuning kering - Tidak ditemukan foto aslinya
+133. Kacang lebui /iris kering - Tidak ditemukan foto aslinya
+134. Kacang merah segar - Tidak ditemukan foto aslinya
+135. Kacang mete/biji jambu monyet segar - Tidak ditemukan foto aslinya
+136. Kacang sukro - Tidak ditemukan foto aslinya
+137. Kacang Tanah atom - Tidak ditemukan foto aslinya
+138. Kacang tanah sangan tanpa selaput - Tidak ditemukan foto aslinya
+139. Kacang tanah sari - Tidak ditemukan foto aslinya
+140. Kacang urei kering - Tidak ditemukan foto aslinya
+141. Kapurung - Tidak ditemukan foto aslinya
+142. Katul Jagung - Tidak ditemukan foto aslinya
+143. Kecipir biji - Tidak ditemukan foto aslinya
+144. Kelapa Muda daging - Tidak ditemukan foto aslinya
+145. Kelapa Setengah Tua daging - Tidak ditemukan foto aslinya
+146. "Kelepon " - Tidak ditemukan foto aslinya
+147. Kemang - Tidak ditemukan foto aslinya
+148. Kembang Turi - Tidak ditemukan foto aslinya
+149. Kenari banda kering - Tidak ditemukan foto aslinya
+150. Keripik tempe abadi murni - Tidak ditemukan foto aslinya
+151. Keripik tempe abadi sedang - Tidak ditemukan foto aslinya
+152. Keripik tempe abadi telur - Tidak ditemukan foto aslinya
+153. Keripik ubi - Tidak ditemukan foto aslinya
+154. Kerupuk Aci - Tidak ditemukan foto aslinya
+155. Kerupuk Melinjo mentah - Tidak ditemukan foto aslinya
+156. Kerupuk Melinjo tebal goreng asin - Tidak ditemukan foto aslinya
+157. Kerupuk Melinjo tebal goreng manis - Tidak ditemukan foto aslinya
+158. Kerupuk Melinjo tipis goreng - Tidak ditemukan foto aslinya
+159. Kerupuk Udang berpati - Tidak ditemukan foto aslinya
+160. Ketela singkong segar - Tidak ditemukan foto aslinya
+161. Kluwek - Tidak ditemukan foto aslinya
+162. Kokosan - Tidak ditemukan foto aslinya
+163. Koro andong kering - Tidak ditemukan foto aslinya
+164. Krokot - Tidak ditemukan foto aslinya
+165. Kue jahe - Tidak ditemukan foto aslinya
+166. Kue kelapa - Tidak ditemukan foto aslinya
+167. Kue lumpur - Tidak ditemukan foto aslinya
+168. "Kue Pia " - Tidak ditemukan foto aslinya
+169. "Kue Satu " - Tidak ditemukan foto aslinya
+170. Kue sus - Tidak ditemukan foto aslinya
+171. "Kue Talam " - Tidak ditemukan foto aslinya
+172. Lamtoro var. gung tanpa kulit - Tidak ditemukan foto aslinya
+173. Lapis legit - Tidak ditemukan foto aslinya
+174. Lemak Babi - Tidak ditemukan foto aslinya
+175. Lepok/Ubi rumput - Tidak ditemukan foto aslinya
+176. "Leupeut Ketan " - Tidak ditemukan foto aslinya
+177. Lokan segar - Tidak ditemukan foto aslinya
+178. Lontar segar - Tidak ditemukan foto aslinya
+179. Lumai/Leunca segar - Tidak ditemukan foto aslinya
+180. Mangga benggala segar - Tidak ditemukan foto aslinya
+181. Mangga Gedong - Tidak ditemukan foto aslinya
+182. Mangga Harum Manis - Tidak ditemukan foto aslinya
+183. Mangga segar - Tidak ditemukan foto aslinya
+184. Martabak mesir - Tidak ditemukan foto aslinya
+185. "Martabak Telur " - Tidak ditemukan foto aslinya
+186. Melase - Tidak ditemukan foto aslinya
+187. Melinjo - Tidak ditemukan foto aslinya
+188. Mi kering - Tidak ditemukan foto aslinya
+189. "Mie Goreng " - Tidak ditemukan foto aslinya
+190. Mie kering - Tidak ditemukan foto aslinya
+191. Mie pangsit basah - Tidak ditemukan foto aslinya
+192. Mie Sagu - Tidak ditemukan foto aslinya
+193. Minyak Zaitun - Tidak ditemukan foto aslinya
+194. Nasi beras merah - Tidak ditemukan foto aslinya
+195. Nasi gemuk - Tidak ditemukan foto aslinya
+196. Nasi jagung - Tidak ditemukan foto aslinya
+197. Nasi rames - Tidak ditemukan foto aslinya
+198. Nasi tim - Tidak ditemukan foto aslinya
+199. "Nasi Uduk " - Tidak ditemukan foto aslinya
+200. Nasu likku masakan - Tidak ditemukan foto aslinya
+201. "Noga Kacang Tanah " - Tidak ditemukan foto aslinya
+202. Oncom ampas kacang hijau - Tidak ditemukan foto aslinya
+203. "Oncom Goreng " - Tidak ditemukan foto aslinya
+204. "Oncom Hitam Goreng bertepung " - Tidak ditemukan foto aslinya
+205. Oncom kacang hijau + singkong - Tidak ditemukan foto aslinya
+206. Oncom Kacang Tanah pepes - Tidak ditemukan foto aslinya
+207. "Oncom Merah Goreng bertepung " - Tidak ditemukan foto aslinya
+208. "Onde - Tidak ditemukan foto aslinya
+209. Papeda - Tidak ditemukan foto aslinya
+210. Parede baleh masakan - Tidak ditemukan foto aslinya
+211. Pati Singkong (tapioka) - Tidak ditemukan foto aslinya
+212. Pelepah manuk masakan - Tidak ditemukan foto aslinya
+213. Pempek kelesan - Tidak ditemukan foto aslinya
+214. Pempek kulit - Tidak ditemukan foto aslinya
+215. Pepea oncom ampas tahu - Tidak ditemukan foto aslinya
+216. Pete Segar - Tidak ditemukan foto aslinya
+217. Pisang Ambon - Tidak ditemukan foto aslinya
+218. Pisang ayam segar - Tidak ditemukan foto aslinya
+219. Pisang kidang segar - Tidak ditemukan foto aslinya
+220. Pisang Lampung - Tidak ditemukan foto aslinya
+221. Pisang talas segar - Tidak ditemukan foto aslinya
+222. Rajungan segar - Tidak ditemukan foto aslinya
+223. Rasbi (Beras Ubi) - Tidak ditemukan foto aslinya
+224. Rasi (Beras Singkong) - Tidak ditemukan foto aslinya
+225. Rawon masakan - Tidak ditemukan foto aslinya
+226. Rebon udang kecil segar - Tidak ditemukan foto aslinya
+227. Renggi goreng - Tidak ditemukan foto aslinya
+228. "Risoles " - Tidak ditemukan foto aslinya
+229. Rumput laut - Tidak ditemukan foto aslinya
+230. Sagu kasbi segar - Tidak ditemukan foto aslinya
+231. Sagu lempeng - Tidak ditemukan foto aslinya
+232. Salak medan segar - Tidak ditemukan foto aslinya
+233. Sale pisang siam - Tidak ditemukan foto aslinya
+234. Saos Tomat - Tidak ditemukan foto aslinya
+235. Sapi daging dendeng mentah - Tidak ditemukan foto aslinya
+236. Sapi dideh/darah - Tidak ditemukan foto aslinya
+237. Sarimuka - Tidak ditemukan foto aslinya
+238. Sate penyu masakan - Tidak ditemukan foto aslinya
+239. Sawo duren segar - Tidak ditemukan foto aslinya
+240. Sawo kecik segar - Tidak ditemukan foto aslinya
+241. Sayur asem - Tidak ditemukan foto aslinya
+242. Sayur garu - Tidak ditemukan foto aslinya
+243. Sayur kohu - Tidak ditemukan foto aslinya
+244. Sayur ndusuk - Tidak ditemukan foto aslinya
+245. Selada - Tidak ditemukan foto aslinya
+246. Selada Air rebus - Tidak ditemukan foto aslinya
+247. Serbuk Coklat - Tidak ditemukan foto aslinya
+248. Singkah (rotan muda) - Tidak ditemukan foto aslinya
+249. "Singkong Goreng " - Tidak ditemukan foto aslinya
+250. Sop Kool - Tidak ditemukan foto aslinya
+251. Soto banjar masakan - Tidak ditemukan foto aslinya
+252. Soto dengan Daging - Tidak ditemukan foto aslinya
+253. Soto kudus masakan - Tidak ditemukan foto aslinya
+254. Soto madura masakan - Tidak ditemukan foto aslinya
+255. Sukiyaki masakan - Tidak ditemukan foto aslinya
+256. Sukun muda segar - Tidak ditemukan foto aslinya
+257. Susu asam untuk bayi bubuk - Tidak ditemukan foto aslinya
+258. Susu Skim (tak berlemak) - Tidak ditemukan foto aslinya
+259. Susu skim segar - Tidak ditemukan foto aslinya
+260. Suweg mentah - Tidak ditemukan foto aslinya
+261. Suweg talas segar - Tidak ditemukan foto aslinya
+262. Talas pontianak segar - Tidak ditemukan foto aslinya
+263. Taoge goreng - Tidak ditemukan foto aslinya
+264. Tauji cap singa - Tidak ditemukan foto aslinya
+265. Tebu Terubuk - Tidak ditemukan foto aslinya
+266. Telur Ayam bagian kuning - Tidak ditemukan foto aslinya
+267. Telur burung puyuh segar - Tidak ditemukan foto aslinya
+268. Tempe koro benguk - Tidak ditemukan foto aslinya
+269. Tepung Garut (arrowroot) - Tidak ditemukan foto aslinya
+270. Tepung Jagung Kuning - Tidak ditemukan foto aslinya
+271. Tepung jagung putih - Tidak ditemukan foto aslinya
+272. Tepung Pisang - Tidak ditemukan foto aslinya
+273. Tepung singkong/ Tapioka - Tidak ditemukan foto aslinya
+274. Tepung Tales Beneng - Tidak ditemukan foto aslinya
+275. Teri balado masakan - Tidak ditemukan foto aslinya
+276. Terong segar - Tidak ditemukan foto aslinya
+277. Tim (nasi tim) - Tidak ditemukan foto aslinya
+278. Tipa - Tidak ditemukan foto aslinya
+279. Tiwul Instan - Tidak ditemukan foto aslinya
+280. Tomat air (juice) segar - Tidak ditemukan foto aslinya
+281. Tomat Masak - Tidak ditemukan foto aslinya
+282. Tomat merah segar - Tidak ditemukan foto aslinya
+283. Tomat muda segar - Tidak ditemukan foto aslinya
+284. Ubi jalar tinta/ kemayung - Tidak ditemukan foto aslinya
+285. Udang galah segar - Tidak ditemukan foto aslinya
+286. Udang kering - Tidak ditemukan foto aslinya
+287. Ulat sagu panggang - Tidak ditemukan foto aslinya

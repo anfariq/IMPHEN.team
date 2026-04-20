@@ -8,15 +8,16 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('foods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->float('calories_per_100g');
-            $table->float('protein')->nullable();
-            $table->float('carbs')->nullable();
-            $table->float('fat')->nullable();
+            $table->double('calories'); // Menggunakan double agar support koma/desimal
+            $table->double('protein')->default(0);
+            $table->double('fat')->default(0);
+            $table->double('carbs')->default(0); // Singkatan dari Karbohidrat
+            $table->text('image_url')->nullable(); // Untuk link gambar JSON atau path lokal
             $table->timestamps();
         });
     }

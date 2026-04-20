@@ -21,10 +21,11 @@ class Food extends Model
      */
     protected $fillable = [
         'name',
-        'calories_per_100g',
+        'calories',
         'protein',
-        'carbs',
         'fat',
+        'carbs',
+        'image_url'
     ];
 
     /**

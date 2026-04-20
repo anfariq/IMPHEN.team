@@ -8,33 +8,32 @@ use Illuminate\Http\Request;
 
 class FoodController extends Controller
 {
-    // List Makanan dengan Search & Pagination
+    // Mengambil semua data makanan dengan pagination (Opsional jika dibutuhkan)
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $foods = Food::when($search, function($query, $search) {
-            return $query->where('name', 'like', "%{$search}%");
-        })->paginate(10);
+        $foods = Food::paginate(20);
+        return response()->json($foods);
+    }
+
+    // Fungsi khusus untuk Live Search di React
+    public function search(Request $request)
+    {
+        $query = $request->query('q');
+
+        // Jika user tidak mengetik apa-apa, kembalikan array kosong
+        if (!$query) {
+            return response()->json([]);
+        }
+
+        // Cari makanan yang namanya mirip dengan inputan user (Limit 15 agar responsif)
+        $foods = Food::where('name', 'LIKE', "%{$query}%")
+                     ->limit(15)
+                     ->get();
 
         return response()->json($foods);
     }
 
-    // Simpan Makanan Baru (Admin Side)
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'calories_per_100g' => 'required|numeric',
-            'protein' => 'nullable|numeric',
-            'carbs' => 'nullable|numeric',
-            'fat' => 'nullable|numeric',
-        ]);
-
-        $food = Food::create($validated);
-        return response()->json($food, 201);
-    }
-
-    // Detail Makanan
+    // Mengambil detail 1 makanan berdasarkan ID
     public function show(Food $food)
     {
         return response()->json($food);
