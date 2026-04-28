@@ -9,6 +9,10 @@ use App\Http\Controllers\Api\SummaryController;
 use App\Http\Controllers\Api\MLProxyController;
 use App\Http\Controllers\Api\PasswordResetController;
 
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Public Routes (Bisa diakses tanpa login)
