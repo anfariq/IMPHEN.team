@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = 3000; // Gerbang berjalan di port 3000
-const LARAVEL_URL = 'http://127.0.0.1:8000'; // Alamat Laravel kamu
+const LARAVEL_URL = 'https://imphenteam-production.up.railway.app'; // Alamat Laravel kamu
 
 // 1. Logika Middleware (Contoh: Catat siapa yang bertamu)
 app.use((req, res, next) => {
@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 
 // 2. Konfigurasi Proxy
 // Semua request yang masuk ke http://localhost:3000/api 
-// akan diteruskan ke http://127.0.0.1:8000/api
+// akan diteruskan ke https://imphenteam-production.up.railway.app/api
 const laravelProxy = createProxyMiddleware({
     target: LARAVEL_URL,
     changeOrigin: true,
