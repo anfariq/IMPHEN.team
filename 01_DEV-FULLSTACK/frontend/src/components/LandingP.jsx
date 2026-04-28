@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles, Rocket, ShieldCheck } from 'lucide-react';
 
 import Footer from './Com-Landi/footer.jsx';
 import Faq from './Com-Landi/faq.jsx';
@@ -55,24 +57,41 @@ export default function App() {
       {/* CTA BANNER */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
         <div className="bg-blue-600 rounded-3xl p-10 md:p-14 text-center text-white relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 20% 50%, white 0%, transparent 60%), radial-gradient(circle at 80% 20%, white 0%, transparent 50%)",
-            }}
-          ></div>
-          <div className="relative">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Mulai diet realistis hari ini
+          
+          {/* Ikon Melayang di Background biar estetik */}
+          <motion.div 
+            animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-10 left-10 opacity-20"
+          >
+            <Sparkles size={80} />
+          </motion.div>
+
+          <motion.div 
+            animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-10 right-10 opacity-20"
+          >
+            <Rocket size={80} />
+          </motion.div>
+
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center gap-3">
+              Mulai diet realistis hari ini <Sparkles className="text-yellow-400" />
             </h2>
             <p className="text-blue-200 mb-8 max-w-md mx-auto">
               Tidak perlu skip nasi. Tidak perlu diet ekstrem. Cukup track
               makanan Indonesia favoritmu.
             </p>
-            <a href="/login" className="bg-white text-blue-600 font-bold px-8 py-4 rounded-xl text-sm hover:bg-blue-50 transition-colors shadow-lg">
-              Start Tracking Now – Free →
-            </a>
+            
+            <motion.a 
+              href="/login" 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 bg-white text-blue-600 font-bold px-8 py-4 rounded-xl text-sm hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Start Tracking Now – Free <ArrowRight size={18} />
+            </motion.a>
           </div>
         </div>
       </section>

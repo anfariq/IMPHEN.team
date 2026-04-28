@@ -20,8 +20,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ButterflyWelcome />} />
-        <Route path="/landing" element={<LandingP />} />
+        <Route path="/" element={<LandingP />} />
+        {/* <Route path="/Welcome" element={<ButterflyWelcome /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

@@ -1,95 +1,144 @@
 import { useState } from 'react';
-
-import { 
-  BLOGS, 
-} from './constants.jsx';
-
-import { BlogModal } from './components.jsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Clock, BookOpen, ChevronRight } from 'lucide-react';
+import { BLOGS } from './constants.jsx';
 
 export default function Blog() {
-      const [selectedBlog, setSelectedBlog] = useState(null);  
+    const [selectedBlog, setSelectedBlog] = useState(null);
 
     return (
-        <section id="blog" className="bg-slate-50 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-widest">
-                Blog & Jurnal
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3">
-                Edukasi gizi makanan Indonesia
-              </h2>
+        <section id="blog" className="bg-slate-50 py-20 md:py-28 overflow-hidden">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+                <div className="mb-12">
+                    <motion.span
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-100/50 px-3 py-1 rounded-full"
+                    >
+                        Blog & Jurnal
+                    </motion.span>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="text-3xl md:text-4xl font-bold text-slate-900 mt-4"
+                    >
+                        Edukasi gizi makanan Indonesia
+                    </motion.h2>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8">
+                    {BLOGS.slice(0, 3).map((b, idx) => (
+                        <motion.article
+                            key={b.title}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.1 }}
+                            whileHover={{ y: -8 }}
+                            onClick={() => setSelectedBlog(b)}
+                            className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 cursor-pointer transition-all duration-300 group"
+                        >
+                            <div className="h-48 overflow-hidden relative">
+                                {b.image ? (
+                                    <img
+                                        src={b.image}
+                                        alt={b.title}
+                                        className="object-cover h-full w-full group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <div className="bg-blue-50 h-full w-full flex items-center justify-center text-blue-300">
+                                        <BookOpen size={40} />
+                                    </div>
+                                )}
+                                <div className="absolute top-4 left-4">
+                                    <span className="text-[10px] font-bold text-white bg-blue-600/80 backdrop-blur-md rounded-lg px-2.5 py-1.5 uppercase tracking-wider">
+                                        {b.tag}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                <div className="flex items-center gap-3 text-slate-400 text-xs mb-3">
+                                    <span className="flex items-center gap-1">
+                                        <Clock size={14} /> {b.mins} baca
+                                    </span>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">
+                                    {b.title}
+                                </h3>
+                                <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                                    {b.desc}
+                                </p>
+                                <div className="flex items-center text-blue-600 text-xs font-bold gap-1 group-hover:gap-2 transition-all">
+                                    Baca Selengkapnya <ChevronRight size={14} />
+                                </div>
+                            </div>
+                        </motion.article>
+                    ))}
+                </div>
             </div>
-            <a
-              href="#"
-              className="hidden md:block text-sm text-blue-600 font-medium hover:underline"
-            >
-              Lihat semua →
-            </a>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {BLOGS.map((b) => (
-              <article
-                key={b.title}
-                className="bg-white rounded-2xl overflow-hidden border border-slate-100 card-hover cursor-pointer"
-              >
-                <div className="h-40 bg-gradient-to-br from-blue-100 to-slate-100 flex items-center justify-center">
-                  {b.image ? (
-                    <img
-                      src={b.image}
-                      alt={b.title}
-                      className="object-cover h-full w-full"
-                    />
-                  ) : (
-                    <div className="text-blue-500 text-sm font-medium">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 rounded-full px-2.5 py-1">
-                      {b.tag}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {b.mins} baca
-                    </span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2 leading-snug">
-                    {b.title}
-                  </h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    {b.desc}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-        {/* Modal Pop-up */}
-        {selectedBlog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="relative h-64">
-                <img src={selectedBlog.image} alt={selectedBlog.title} className="w-full h-full object-cover" />
-                <button 
-                  onClick={() => setSelectedBlog(null)}
-                  className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-2 rounded-full transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="p-8">
-                <span className="text-blue-600 font-bold text-xs uppercase">{selectedBlog.tag}</span>
-                <h2 className="text-2xl font-bold text-slate-900 mt-2 mb-4">{selectedBlog.title}</h2>
-                <div className="prose prose-slate text-slate-600">
-                  <p>{selectedBlog.content || selectedBlog.desc}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+
+            {/* Modal Pop-up dengan Framer Motion */}
+            <AnimatePresence>
+                {selectedBlog && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSelectedBlog(null)}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl relative"
+                        >
+                            <button
+                                onClick={() => setSelectedBlog(null)}
+                                className="absolute top-5 right-5 z-10 bg-black/20 hover:bg-black/40 backdrop-blur-xl text-white p-2 rounded-full transition-all"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="h-64 sm:h-80 overflow-hidden">
+                                <img
+                                    src={selectedBlog.image}
+                                    alt={selectedBlog.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+
+                            <div className="p-8 sm:p-10 overflow-y-auto max-h-[calc(85vh-320px)]">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="text-blue-600 font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">
+                                        {selectedBlog.tag}
+                                    </span>
+                                    <span className="text-slate-400 text-xs flex items-center gap-1">
+                                        <Clock size={14} /> {selectedBlog.mins} menit membaca
+                                    </span>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6 leading-tight">
+                                    {selectedBlog.title}
+                                </h2>
+                                <div className="prose prose-blue max-w-none text-slate-600 leading-relaxed space-y-4">
+                                    <p className="text-lg font-medium text-slate-700 italic border-l-4 border-blue-500 pl-4">
+                                        {selectedBlog.desc}
+                                    </p>
+                                    <div className="space-y-4 text-base leading-loose border-t border-slate-100 pt-6">
+                                        {selectedBlog.content.split('\n').map((paragraph, i) => (
+                                            <p key={i}>{paragraph}</p>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </section>
     );
 }

@@ -131,6 +131,48 @@ export const TESTIMONIALS = [
     text: "Sudah 2 bulan turun 5 kg hanya dengan tracking pakai app ini. Simple dan tidak ribet.",
     avatar: "DA",
   },
+  {
+    name: "Fajri M.",
+    city: "Yogyakarta",
+    text: "Biasanya susah cari kalori Gudeg di app luar. Di sini lengkap dari krecek sampai arehnya!",
+    avatar: "FM",
+  },
+  {
+    name: "Siti K.",
+    city: "Makassar",
+    text: "Membantu banget buat pantau kalori Coto Makassar kesukaan. Diet tapi tetap bisa makan enak.",
+    avatar: "SK",
+  },
+  {
+    name: "Andi R.",
+    city: "Medan",
+    text: "Interface-nya bersih dan ringan. Gak bikin HP panas pas lagi input menu sarapan.",
+    avatar: "AR",
+  },
+  {
+    name: "Maya T.",
+    city: "Semarang",
+    text: "Gorengan-nya detail banget, dari bakwan sampai mendoan ada. Jadi tahu batas makannya.",
+    avatar: "MT",
+  },
+  {
+    name: "Hendra W.",
+    city: "Denpasar",
+    text: "Fitur AI-nya canggih, foto makanan langsung keluar estimasi kalorinya. Keren banget!",
+    avatar: "HW",
+  },
+  {
+    name: "Laras P.",
+    city: "Malang",
+    text: "Dosen saya sampai kaget saya bisa diet tapi tetap makan Bakso Malang tiap hari. Rahasianya ya di-track!",
+    avatar: "LP",
+  },
+  {
+    name: "Rizky D.",
+    city: "Palembang",
+    text: "Pempek kapal selam favorit saya ada di sini. Akhirnya bisa diet tanpa musuhan sama makanan lokal.",
+    avatar: "RD",
+  },
 ];
 
 export const FAQS = [
@@ -159,6 +201,7 @@ export const BLOGS = [
     desc: "Breakdown lengkap kalori rendang, gulai, dan sayur nangka dalam satu porsi.",
     mins: "4 min",
     image: "https://rricoid-assets.obs.ap-southeast-4.myhuaweicloud.com/berita/Palangkaraya/o/1745972783410-IMG_2765_jpg/ceuz3r5in0zrxp3.webp",
+    content: "Nasi Padang seringkali dianggap 'musuh' bagi orang yang sedang berdiet. Padahal, kuncinya bukan pada menunya, tapi pada porsi dan pilihan lauknya. Satu porsi nasi padang lengkap bisa mencapai 800-1000 kkal. Komponen terbesar biasanya berasal dari nasi putih (sekitar 200 kkal), Rendang Daging (190 kkal per potong), dan Gulai Daun Singkong yang santannya pekat (sekitar 100 kkal). Tips dari HealthyAI: Mintalah kuah santan dipisah atau dikurangi, dan perbanyak porsi sayur nangka tanpa kuah berlebih untuk menekan asupan lemak jenuh."
   },
   {
     tag: "Tips Diet",
@@ -166,6 +209,7 @@ export const BLOGS = [
     desc: "Cara menikmati gorengan favorit tanpa merusak progress diet Anda.",
     mins: "3 min",
     image: "https://cdn0-production-images-kly.akamaized.net/u5B4WzGlgXDauFGKRmii9tm0IIY=/1x61:1000x624/1200x675/filters:quality(75):strip_icc():format(jpeg)/kly-media-production/medias/4300389/original/060560700_1674522690-shutterstock_1893335917.jpg",
+    content: "Gorengan adalah bagian tak terpisahkan dari budaya makan kita. Kabar baiknya, Anda tidak perlu 100% berhenti makan gorengan. Satu buah bakwan goreng rata-rata mengandung 130-150 kkal, sebagian besar berasal dari minyak goreng yang diserap tepung. Jika Anda ingin makan gorengan saat diet, cobalah teknik 'Saving Calories'. Jika Anda tahu sore nanti akan makan mendoan, kurangi porsi lemak pada makan siang Anda. Selain itu, selalu gunakan tisu penyerap minyak sebelum menyantapnya. Ingat, diet adalah tentang keseimbangan jangka panjang, bukan penyiksaan diri."
   },
   {
     tag: "Gaya Hidup",
@@ -173,5 +217,6 @@ export const BLOGS = [
     desc: "Panduan memilih makanan bergizi dari warung makan sehari-hari.",
     mins: "5 min",
     image: "https://shopee.co.id/inspirasi-shopee/wp-content/uploads/2019/02/Food_at_Warung_Tegal.jpg",
+    content: "Warung Tegal atau Warteg sebenarnya adalah surga bagi pelaku diet jika tahu cara memilihnya. Berbeda dengan junk food, Warteg menyediakan sayuran segar seperti tumis kangkung, buncis, dan tauge yang dimasak harian. Untuk protein yang sehat dan murah, pilihlah tempe orek, telur balado, atau ikan kembung. Hindari menu yang digoreng garing (deep fried) dan usahakan setengah piring Anda diisi oleh sayuran. Dengan modal 15-20 ribu rupiah saja, Anda sudah bisa mendapatkan makanan dengan makronutrisi yang lengkap dan seimbang."
   },
 ];
