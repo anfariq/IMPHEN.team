@@ -1,0 +1,5 @@
+[variables]
+    PHP_VERSION = '8.4'
+
+[phases.setup]
+    nixPkgs = ['...', 'php84', 'php84Packages.composer']
