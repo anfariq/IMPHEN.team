@@ -22,7 +22,11 @@ export default function Profile() {
 
     useEffect(() => {
         fetch("http://localhost:3000/api/profile", {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Accept': 'application/json',
+                'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
+            },
         })
             .then((res) => res.json())
             .then((data) => {

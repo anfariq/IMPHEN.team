@@ -21,6 +21,7 @@ export default function ForgotPassword() {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json", // Wajib agar Laravel merespon dengan JSON saat error
+          "x-api-key": "WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=="
         },
         body: JSON.stringify({ email }),
       });

@@ -1,87 +1,63 @@
-const BASE_URL = "http://localhost:3000/api";
+import axios from 'axios';
 
-export async function apiFetch(endpoint, options = {}) {
+// 1. Buat instance Axios
+const api = axios.create({
+  // Ganti dengan link Gateway Node.js kamu yang di Railway nanti
+  baseURL: 'http://localhost:3000/api', // Contoh: 'https://gateway-railway-production.up.railway.app/api'
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ==' // Sesuai dengan di Node.js Gateway
+  }
+});
+
+// 2. Interceptor untuk otomatis nambahin Token Bearer (Biar nggak nulis manual terus)
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(options.headers || {}),
-    },
-  });
-
-  let data;
-
-  try {
-    data = await res.json();
-  } catch {
-    throw new Error("Response bukan JSON (backend error)");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  if (!res.ok) {
-    throw new Error(data.message || "API Error");
-  }
+/**
+ * REUSABLE API FUNCTIONS
+ */
 
-  return data;
-}
-
-export async function apiGet(path, token) {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-
-  const text = await res.text();
-
+// Helper umum untuk GET
+export async function apiGet(path) {
   try {
-    return JSON.parse(text);
-  } catch {
-    console.error("Non-JSON response:", text);
-    throw new Error("Backend tidak mengembalikan JSON");
+    const response = await api.get(path);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal mengambil data");
   }
 }
 
-export async function apiPost(path, body, token) {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  const text = await res.text();
-
+// Helper umum untuk POST
+export async function apiPost(path, body) {
   try {
-    return JSON.parse(text);
-  } catch {
-    console.error("Non-JSON response:", text);
-    throw new Error("Backend tidak mengembalikan JSON");
+    const response = await api.post(path, body);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal mengirim data");
   }
 }
 
-const getToken = () => localStorage.getItem("token");
+/**
+ * SPECIFIC SERVICES
+ */
 
 export async function getActivities() {
-    const res = await fetch(`${BASE_URL}/activities`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${getToken()}`
-        }
-    });
-
-    if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(errText);
-    }
-
-    const data = await res.json();
-    return data;
+    // Karena sudah pakai axios instance 'api', 
+    // endpoint otomatis nyambung ke baseURL + '/activities'
+    // Header API Key dan Bearer Token sudah otomatis terpasang
+    return await apiGet('/activities');
 }
+
+// Tambahan contoh untuk Login (Biasanya nggak butuh Bearer token di awal)
+export async function loginUser(credentials) {
+    return await apiPost('/login', credentials);
+}
+
+export default api;
