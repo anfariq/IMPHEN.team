@@ -16,23 +16,24 @@ class MLProxyController extends Controller
         $this->mlService = $ml;
     }
 
-    public function predictBurn(Request $request)
+    public function predictFood(Request $request)
     {
-        // Data input dari Next.js (usia, berat, denyut jantung, dll)
+        // Validasi input dari React/Next.js
         $inputData = $request->validate([
-            'age' => 'required|numeric',
-            'weight' => 'required|numeric',
-            'heart_rate' => 'required|numeric',
-            'duration' => 'required|numeric',
+            'protein' => 'required|numeric',
+            'lemak' => 'required|numeric',
+            'karbohidrat' => 'required|numeric',
+            'total_nutrisi' => 'required|numeric',
+            'gram' => 'numeric', // Default 100g jika tidak diisi
         ]);
 
-        // Panggil AI Service
-        $prediction = $this->mlService->getPrediction('/predict-burn', $inputData);
+        // Panggil Service yang nembak ke Hugging Face
+        $prediction = $this->mlService->getPrediction('/predict-calories', $inputData);
 
-        // Catat ke Log (Hitam di atas putih)
+        // Logging otomatis
         MLPredictionLog::create([
             'user_id' => $request->user()->id,
-            'endpoint' => '/predict-burn',
+            'endpoint' => '/predict-calories',
             'request_payload' => $inputData,
             'response_payload' => $prediction,
             'status' => $prediction['status']

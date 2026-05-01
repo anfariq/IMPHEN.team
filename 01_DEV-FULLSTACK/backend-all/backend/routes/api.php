@@ -15,7 +15,7 @@ Route::get('/health', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (Bisa diakses tanpa login)
+| Public Routes
 |--------------------------------------------------------------------------
 */
 Route::post('/register', [AuthController::class, 'register']);
@@ -25,18 +25,18 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
 /*
 |--------------------------------------------------------------------------
-| Protected Routes (Wajib pakai Bearer Token / Login)
+| Protected Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
     // Profil User
     Route::get('/profile', [AuthController::class, 'showProfile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
-
-    // Auth & Profile
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Makanan (CRUD & List)
+    // Makanan (CRUD & Search)
+    // Tambahkan route search SEBELUM resource /foods agar tidak dianggap sebagai ID
+    Route::get('/foods/search', [FoodController::class, 'search']); 
     Route::get('/foods', [FoodController::class, 'index']);
     Route::post('/foods', [FoodController::class, 'store']);
     Route::get('/foods/{food}', [FoodController::class, 'show']);
@@ -49,10 +49,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/activities/record', [ActivityController::class, 'history']);
     Route::post('/activities/record', [ActivityController::class, 'store']);
 
-
     // Dashboard & Grafik
     Route::get('/dashboard', [SummaryController::class, 'getDashboardData']);
 
-    // Machine Learning Proxy
-    Route::post('/ml/predict-burn', [MLProxyController::class, 'predictBurn']);
+    /*
+    |----------------------------------------------------------------------
+    | Machine Learning Proxy
+    |----------------------------------------------------------------------
+    */
+    Route::prefix('ml')->group(function () {
+        // Untuk menghitung kalori terbakar (Olahraga)
+        Route::post('/predict-burn', [MLProxyController::class, 'predictBurn']);
+        
+        // Tambahkan ini untuk menghitung kalori makanan (Nutrisi)
+        Route::post('/predict-calories', [MLProxyController::class, 'predictFood']);
+    });
 });

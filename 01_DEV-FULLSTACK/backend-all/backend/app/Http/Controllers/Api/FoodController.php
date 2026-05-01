@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Food;
 use Illuminate\Http\Request;
+use App\Services\MLClientService;
+use App\Models\MLPredictionLog;
 
 class FoodController extends Controller
 {
@@ -27,15 +29,31 @@ class FoodController extends Controller
 
         // Cari makanan yang namanya mirip dengan inputan user (Limit 15 agar responsif)
         $foods = Food::where('name', 'LIKE', "%{$query}%")
-                     ->limit(15)
-                     ->get();
+            ->limit(15)
+            ->get();
 
         return response()->json($foods);
     }
 
     // Mengambil detail 1 makanan berdasarkan ID
-    public function show(Food $food)
+    public function show(Food $food, MLClientService $mlService)
     {
-        return response()->json($food);
+        // Siapkan data nutrisi dari database untuk dikirim ke AI
+        $nutrisi = [
+            'protein' => $food->protein,
+            'lemak' => $food->fat,
+            'karbohidrat' => $food->carbohydrate,
+            'total_nutrisi' => $food->protein + $food->fat + $food->carbohydrate,
+            'gram' => 100 // Standar per 100g
+        ];
+
+        // Tanya AI Hugging Face
+        $aiResult = $mlService->getPrediction('/predict-calories', $nutrisi);
+
+        return response()->json([
+            'food_info' => $food,
+            'ai_prediction' => $aiResult['data'] ?? null,
+            'status' => $aiResult['status']
+        ]);
     }
 }
