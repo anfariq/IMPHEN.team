@@ -55,5 +55,6 @@ class FoodController extends Controller
             'ai_prediction' => $aiResult['data'] ?? null,
             'status' => $aiResult['status']
         ]);
+        
     }
 }
