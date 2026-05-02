@@ -41,7 +41,7 @@ export default function ResetPassword() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/reset-password", {
+      const response = await fetch("https://gateforlaravl.vercel.app/api/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

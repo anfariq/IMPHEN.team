@@ -16,7 +16,7 @@ export default function ForgotPassword() {
 
     try {
       // Ganti URL ini sesuai dengan URL backend Laravel Anda
-      const response = await fetch("http://localhost:3000/api/forgot-password", {
+      const response = await fetch("https://gateforlaravl.vercel.app/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -139,7 +139,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     if (!token) { window.location.href = "/login"; return; }
 
-    fetch("http://localhost:3000/api/dashboard", {
+    fetch("https://gateforlaravl.vercel.app/api/dashboard", {
       headers: { 
         Authorization: `Bearer ${token}`,
         'Accept': 'application/json',

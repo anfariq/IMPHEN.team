@@ -21,7 +21,7 @@ export default function Profile() {
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/profile", {
+        fetch("https://gateforlaravl.vercel.app/api/profile", {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Accept': 'application/json',
@@ -56,7 +56,7 @@ export default function Profile() {
         setSaving(true);
 
         try {
-            const response = await fetch("http://localhost:3000/api/profile", {
+            const response = await fetch("https://gateforlaravl.vercel.app/api/profile", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

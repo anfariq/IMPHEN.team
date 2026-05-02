@@ -23,7 +23,7 @@ const FoodPredictor = () => {
     const fetchFoods = async () => {
         try {
             // Gunakan port 8000 langsung jika 3000 masih 401 Unauthorized
-            const res = await axios.get(`http://localhost:3000/api/foods/search?q=${search}`, {
+            const res = await axios.get(`https://gateforlaravl.vercel.app/api/foods/search?q=${search}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -60,7 +60,7 @@ const FoodPredictor = () => {
             };
 
             // 1. Ambil Prediksi AI
-            const res = await axios.post('http://localhost:3000/api/ml/predict-calories', payload, {
+            const res = await axios.post('https://gateforlaravl.vercel.app/api/ml/predict-calories', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
@@ -87,7 +87,7 @@ const FoodPredictor = () => {
     const saveToIntake = async (foodId, qty, calories) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:3000/api/food-intake', {
+            await axios.post('https://gateforlaravl.vercel.app/api/food-intake', {
                 food_id: foodId,
                 qty_grams: qty,
                 total_calories: calories,
