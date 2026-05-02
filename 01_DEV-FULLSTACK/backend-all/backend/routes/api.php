@@ -23,6 +23,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
+Route::get('/foods/search', [FoodController::class, 'search']); 
+Route::get('/foods', [FoodController::class, 'index']);
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes
@@ -36,10 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Makanan (CRUD & Search)
     // Tambahkan route search SEBELUM resource /foods agar tidak dianggap sebagai ID
-    Route::get('/foods/search', [FoodController::class, 'search']); 
-    Route::get('/foods', [FoodController::class, 'index']);
     Route::post('/foods', [FoodController::class, 'store']);
     Route::get('/foods/{food}', [FoodController::class, 'show']);
+
+    Route::post('/food-intake', [IntakeController::class, 'store']);
 
     // Catatan Makan (Intake)
     Route::post('/intakes', [IntakeController::class, 'store']);

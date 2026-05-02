@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const LARAVEL_URL = 'https://imphenteam-production.up.railway.app';
+const LARAVEL_URL = 'http://localhost:8000'; // https://imphenteam-production.up.railway.app
 const GATEWAY_API_KEY = process.env.GATEWAY_API_KEY;
 const cors = require('cors');
 

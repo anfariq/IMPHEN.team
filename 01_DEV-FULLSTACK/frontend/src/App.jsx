@@ -14,6 +14,7 @@ import ResetPassword from './components/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Activity from './pages/Activity'
 import Profile from './pages/Profile'
+import Foods from './pages/Foods'
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/activity" element={<Activity />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/foods" element={<Foods />} />
       </Routes>
     </BrowserRouter>
   )

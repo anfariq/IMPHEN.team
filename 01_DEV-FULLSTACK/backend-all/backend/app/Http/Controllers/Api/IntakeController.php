@@ -22,31 +22,33 @@ class IntakeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'food_id' => 'required|exists:foods,id',
-            'qty_grams' => 'required|numeric',
-            'consumed_at' => 'required|date',
-        ]);
+        try {
+            $request->validate([
+                'food_id' => 'required|exists:foods,id',
+                'qty_grams' => 'required|numeric',
+                'total_calories' => 'required|numeric',
+                'consumed_at' => 'nullable|date',
+            ]);
 
-        $food = Food::find($request->food_id);
-        
-        // Hitung kalori lewat Service
-        $totalCal = $this->calorieService->calculateFoodCalories(
-            $food->calories_per_100g, 
-            $request->qty_grams
-        );
+            $intake = UserFoodIntake::create([
+                'user_id' => $request->user()->id,
+                'food_id' => $request->food_id,
+                'qty_grams' => $request->qty_grams,
+                'total_calories' => $request->total_calories,
+                'consumed_at' => $request->consumed_at ?? now(),
+            ]);
 
-        $intake = UserFoodIntake::create([
-            'user_id' => $request->user()->id,
-            'food_id' => $request->food_id,
-            'qty_grams' => $request->qty_grams,
-            'total_calories' => $totalCal,
-            'consumed_at' => $request->consumed_at,
-        ]);
+            // Trigger update summary
+            $this->summaryService->updateDailySummary($request->user()->id);
 
-        // Update Ringkasan Harian secara otomatis
-        $this->summaryService->updateDailySummary($request->user()->id);
+            return response()->json(['status' => 'success', 'data' => $intake]);
 
-        return response()->json($intake, 201);
+        } catch (\Exception $e) {
+            // Ini akan memunculkan pesan error asli kalau ada yang salah di database/service
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

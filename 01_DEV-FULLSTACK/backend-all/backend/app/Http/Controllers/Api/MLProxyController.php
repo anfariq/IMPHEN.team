@@ -29,7 +29,7 @@ class MLProxyController extends Controller
 
         // Panggil Service yang nembak ke Hugging Face
         $prediction = $this->mlService->getPrediction('/predict-calories', $inputData);
-
+        
         // Logging otomatis
         MLPredictionLog::create([
             'user_id' => $request->user()->id,
@@ -37,7 +37,7 @@ class MLProxyController extends Controller
             'request_payload' => $inputData,
             'response_payload' => $prediction,
             'status' => $prediction['status']
-        ]);
+        ]); 
 
         return response()->json($prediction);
     }

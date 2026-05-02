@@ -7,6 +7,7 @@ use App\Models\Food;
 use Illuminate\Http\Request;
 use App\Services\MLClientService;
 use App\Models\MLPredictionLog;
+use App\Models\UserFoodIntake;
 
 class FoodController extends Controller
 {
@@ -21,13 +22,10 @@ class FoodController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('q');
-
-        // Jika user tidak mengetik apa-apa, kembalikan array kosong
-        if (!$query) {
+        if (!$query)
             return response()->json([]);
-        }
 
-        // Cari makanan yang namanya mirip dengan inputan user (Limit 15 agar responsif)
+        // Gunakan kolom 'name' sesuai screenshot Supabase kamu
         $foods = Food::where('name', 'LIKE', "%{$query}%")
             ->limit(15)
             ->get();
@@ -35,19 +33,16 @@ class FoodController extends Controller
         return response()->json($foods);
     }
 
-    // Mengambil detail 1 makanan berdasarkan ID
     public function show(Food $food, MLClientService $mlService)
     {
-        // Siapkan data nutrisi dari database untuk dikirim ke AI
         $nutrisi = [
             'protein' => $food->protein,
-            'lemak' => $food->fat,
-            'karbohidrat' => $food->carbohydrate,
-            'total_nutrisi' => $food->protein + $food->fat + $food->carbohydrate,
-            'gram' => 100 // Standar per 100g
+            'lemak' => $food->fat,        // Di screenshot namanya 'fat'
+            'karbohidrat' => $food->carbs, // Di screenshot namanya 'carbs'
+            'total_nutrisi' => $food->protein + $food->fat + $food->carbs,
+            'gram' => 100
         ];
 
-        // Tanya AI Hugging Face
         $aiResult = $mlService->getPrediction('/predict-calories', $nutrisi);
 
         return response()->json([
@@ -55,6 +50,28 @@ class FoodController extends Controller
             'ai_prediction' => $aiResult['data'] ?? null,
             'status' => $aiResult['status']
         ]);
-        
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'food_id' => 'required|exists:foods,id',
+            'qty_grams' => 'required|numeric',
+            'total_calories' => 'required|numeric',
+        ]);
+
+        $intake = UserFoodIntake::create([
+            'user_id' => $request->user()->id, // Ambil ID dari token login
+            'food_id' => $validated['food_id'],
+            'qty_grams' => $validated['qty_grams'],
+            'total_calories' => $validated['total_calories'],
+            'consumed_at' => now(), // Otomatis set waktu sekarang
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data makan berhasil disimpan!',
+            'data' => $intake
+        ], 201);
     }
 }

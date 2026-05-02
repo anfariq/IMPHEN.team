@@ -15,38 +15,44 @@ class SummaryController extends Controller
         $user = $request->user();
         $todayDate = now()->toDateString();
 
-        // 1. Ambil ringkasan harian (Kalori & Nutrisi)
         $today = DailySummary::where('user_id', $user->id)
             ->whereDate('date', $todayDate)
             ->first();
 
-        // 2. Ambil riwayat aktivitas olahraga HARI INI (Maksimal 5 agar dashboard rapi)
-        $recentActivities = UserActivityBurn::with('activity')
+        // AMBIL DATA MAKANAN TERAKHIR (ID, Nama dari relasi food, Jam, dan Kalori)
+        $recentMeals = \App\Models\UserFoodIntake::with('food')
+            ->where('user_id', $user->id)
+            ->whereDate('consumed_at', $todayDate)
+            ->orderBy('consumed_at', 'desc') // Paling baru di atas
+            ->take(5)
+            ->get()
+            ->map(function ($intake) {
+                return [
+                    'name' => $intake->food->name ?? 'Unknown Food',
+                    'time' => $intake->consumed_at->format('H:i'), // Format jam:menit
+                    'calories' => $intake->total_calories,
+                ];
+            });
+
+        $recentActivities = \App\Models\UserActivityBurn::with('activity')
             ->where('user_id', $user->id)
             ->whereDate('created_at', $todayDate)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // 3. Kembalikan response JSON sesuai format yang dibaca oleh React Dashboard
         return response()->json([
             'target_calories' => $user->profile->target_calories ?? 2000,
-            
-            // Bungkus di dalam 'today' sesuai dengan ekspektasi Frontend
             'today' => [
-                'calories_in'  => $today->calories_in ?? 0,
-                'calories_out' => $today->calories_out ?? 0, // Untuk dimunculkan di hero card
-                
+                'calories_in' => $today->calories_in ?? 0,
+                'calories_out' => $today->calories_out ?? 0,
                 'protein' => $today->protein ?? 0,
-                'carbs'   => $today->carbs ?? 0,
-                'fat'     => $today->fat ?? 0,
-                'water'   => $today->water ?? 0,
-                
-                'meals'      => [], // Nanti diisi dari table intake
-                'activities' => $recentActivities, // Data aktivitas masuk ke sini
+                'carbs' => $today->carbs ?? 0,
+                'fat' => $today->fat ?? 0,
+                'water' => $today->water ?? 0,
+                'meals' => $recentMeals, // <-- SEKARANG SUDAH BERISI DATA REAL
+                'activities' => $recentActivities,
             ],
-            
-            'chart' => [],
         ]);
     }
 }
