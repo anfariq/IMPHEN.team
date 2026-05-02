@@ -26,7 +26,7 @@ app.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
   credentials: true // Penting kalau kamu mainan cookie/session
 }));
 
