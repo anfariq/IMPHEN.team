@@ -51,7 +51,9 @@ const laravelProxy = createProxyMiddleware({
 // Terapkan proteksi authMiddleware SEBELUM proxy
 app.use('/', authMiddleware, laravelProxy);
 
+module.exports = app;
+/*
 app.listen(PORT, () => {
     console.log(`🚀 Gerbang Node.js aktif di port ${PORT}`);
     console.log(`🔑 Proteksi API Key diaktifkan.`);
-});
+});*/
