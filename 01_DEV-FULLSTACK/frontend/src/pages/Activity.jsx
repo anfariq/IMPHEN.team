@@ -118,7 +118,7 @@ export default function Activity() {
         <div className="bg-blue-600 text-white p-6 rounded-2xl">
           <p>Calories Burned</p>
           <h2 className="text-3xl font-bold">
-            {totalBurned.toFixed(2)} kcal
+            {(Number(totalBurned) || 0).toFixed(0)} kcal
           </h2>
         </div>
 
