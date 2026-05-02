@@ -8,10 +8,26 @@ const LARAVEL_URL = 'https://imphenteam-production.up.railway.app'; // https://i
 const GATEWAY_API_KEY = process.env.GATEWAY_API_KEY;
 const cors = require('cors');
 
-// Izinkan FE kamu akses (Ganti URL-nya sesuai URL localhost/production FE kamu)
+const allowedOrigins = [
+  'http://localhost:5173',                   // Tetap izinkan local buat dev
+  'https://preview-imphen.ownspace.my.id',    // Domain frontend kamu sekarang
+  'https://imphen.ownspace.my.id'             // Jaga-jaga kalau nanti ganti domain utama
+];
+
 app.use(cors({
-    origin: '*', // Untuk dev boleh '*', tapi pas production ganti ke URL frontendmu
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
+  origin: function (origin, callback) {
+    // izinkan request tanpa origin (seperti mobile apps atau curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Accept'],
+  credentials: true // Penting kalau kamu mainan cookie/session
 }));
 
 // 1. Logika Logging
