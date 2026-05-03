@@ -57,10 +57,24 @@ app.use((req, res, next) => {
 
 // 4. AUTH MIDDLEWARE
 const authMiddleware = (req, res, next) => {
+    // 1. KASIH JALAN TOL buat request OPTIONS (Preflight) dan Favicon
+    if (req.method === 'OPTIONS' || req.url === '/favicon.ico') {
+        return next();
+    }
+
+    // 2. KASIH JALAN TOL buat cek status (opsional, biar tau gateway idup)
+    if (req.url === '/') {
+        return res.status(200).send("Gateway is running!");
+    }
+
     const userApiKey = req.headers['x-api-key'];
 
+    // Debugging di Vercel Log: Cek apa yang sebenernya diterima server
+    console.log(`[DEBUG] Incoming Key: ${userApiKey}`);
+    console.log(`[DEBUG] Expected Key: ${GATEWAY_API_KEY}`);
+
     if (!userApiKey || userApiKey !== GATEWAY_API_KEY) {
-        console.log(`[GATEWAY] Akses Ditolak: API Key tidak valid!`);
+        console.log(`[GATEWAY] Akses Ditolak!`);
         return res.status(401).json({ 
             success: false, 
             message: 'Unauthorized: API Key diperlukan.' 
