@@ -10,8 +10,7 @@ const GATEWAY_API_KEY = process.env.GATEWAY_API_KEY;
 // 1. DYNAMIC CORS MIDDLEWARE
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://preview-imphen.ownspace.my.id',
-  'https://imphen.ownspace.my.id'
+  'https://frontend-kohl-beta-61.vercel.app'
 ];
 
 app.use((req, res, next) => {
