@@ -14,22 +14,24 @@ const allowedOrigins = [
   'https://imphen.ownspace.my.id'
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Izinkan request tanpa origin (seperti server-to-server)
-    if (!origin) return callback(null, true);
+app.use((req, res, next) => {
+    // Hapus header origin bawaan jika ada
+    res.removeHeader('Access-Control-Allow-Origin');
     
+    const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS blocked by Gateway'));
+        res.setHeader('Access-Control-Allow-Origin', origin);
     }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Accept'],
-  credentials: true,
-  optionsSuccessStatus: 200 // Paksa status 200 untuk preflight
-}));
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key, Accept');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
 
 // 2. EXTRA HEADER FIX (PENTING UNTUK VERCEL)
 // Ini untuk memastikan header Access-Control tidak ditimpa oleh proxy
