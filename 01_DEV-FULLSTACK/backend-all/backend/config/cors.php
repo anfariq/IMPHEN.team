@@ -6,7 +6,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173'],
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'https://frontend-kohl-beta-61.vercel.app',
+        // 'https://preview-imphen.ownspace.my.id'
+    ],
 
     'allowed_origins_patterns' => [],
 
