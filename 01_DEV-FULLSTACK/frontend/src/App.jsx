@@ -14,25 +14,29 @@ import ResetPassword from './components/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Activity from './pages/Activity'
 import Profile from './pages/Profile'
-import Foods from './pages/Foods'
+
+// Toast
+import { Toaster } from 'react-hot-toast';
 
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingP />} />
-        {/* <Route path="/Welcome" element={<ButterflyWelcome /> */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/activity" element={<Activity />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/foods" element={<Foods />} />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <Toaster position="top-right" reverseOrder={false} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingP />} />
+          {/* <Route path="/Welcome" element={<ButterflyWelcome /> */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/activity" element={<Activity />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   )
 }
 

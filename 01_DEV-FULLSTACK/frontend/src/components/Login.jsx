@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -46,11 +47,39 @@ export default function Login() {
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      showToast("Login berhasil");
+      toast.success('Selamat Datang Kembali!', {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#2563eb', // Warna biru yang senada dengan UI kamu
+          secondary: '#fff',
+        },
+      });
 
       navigate("/dashboard");
     } catch (err) {
-      showToast(err.message);
+      toast.error(err.message, {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#dc2626', // Warna merah untuk error
+          secondary: '#fff',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -62,7 +91,7 @@ export default function Login() {
 
         {/* BACK TO LANDING */}
         <a
-          href="/landing"
+          href="/"
           className="absolute top-4 left-4 text-sm text-white font-medium hover:underline"
         >
           ← Back to Home
@@ -115,14 +144,7 @@ export default function Login() {
             </div>
 
             {/* Remember + Forgot */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  className="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                Remember me
-              </label>
+            <div className="flex items-center justify-end">
 
               <a
                 href="/forgot-password"

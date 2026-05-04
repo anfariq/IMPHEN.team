@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const FoodPredictor = () => {
+const FoodPredictor = ({ onSuccess }) => {
     const [search, setSearch] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [selectedFood, setSelectedFood] = useState(null);
@@ -22,12 +22,11 @@ const FoodPredictor = () => {
 
     const fetchFoods = async () => {
         try {
-            // Gunakan port 8000 langsung jika 3000 masih 401 Unauthorized
             const res = await axios.get(`https://gateforlaravl.vercel.app/api/foods/search?q=${search}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ==' // Sesuai dengan di Node.js Gateway
+                    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
                 }
             });
             setSuggestions(res.data);
@@ -38,7 +37,7 @@ const FoodPredictor = () => {
 
     const handleSelectFood = (food) => {
         setSelectedFood(food);
-        setSearch(food.name); // Sesuaikan dengan kolom 'name' di DB
+        setSearch(food.name);
         setSuggestions([]);
     };
 
@@ -59,7 +58,6 @@ const FoodPredictor = () => {
                 total_nutrisi: p + l + k, gram: g
             };
 
-            // 1. Ambil Prediksi AI
             const res = await axios.post('https://gateforlaravl.vercel.app/api/ml/predict-calories', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -70,7 +68,6 @@ const FoodPredictor = () => {
             const hasilCalori = res.data.total_calories || res.data.data?.total_calories;
             setResult(res.data);
 
-            // 2. SIMPAN KE DATABASE (user_food_intakes)
             if (hasilCalori) {
                 await saveToIntake(selectedFood.id, g, hasilCalori);
             }
@@ -83,7 +80,6 @@ const FoodPredictor = () => {
         }
     };
 
-    // Fungsi tambahan untuk simpan ke DB
     const saveToIntake = async (foodId, qty, calories) => {
         try {
             const token = localStorage.getItem('token');
@@ -96,17 +92,18 @@ const FoodPredictor = () => {
                 headers: { 
                     Authorization: `Bearer ${token}` ,
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
-
-            }
+                }
             });
             console.log("History makan tersimpan!");
+            // Panggil fungsi onSuccess (dari dashboard) setelah sukses menyimpan
+            if (onSuccess) onSuccess(); 
         } catch (err) {
             console.error("Gagal simpan history makan", err);
         }
     };
 
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-3xl shadow-2xl border border-gray-100">
+        <div className="w-full p-6 bg-white rounded-3xl shadow-2xl border border-gray-100">
             <h2 className="text-2xl font-black text-gray-800 mb-1">Cari Makanan 🍲</h2>
             <p className="text-sm text-gray-500 mb-6">Pilih dari database untuk hitung kalori.</p>
 
@@ -121,7 +118,6 @@ const FoodPredictor = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
 
-                    {/* SUGGESTION LIST DIBERIKAN CONTAINER AGAR RAPI */}
                     {suggestions.length > 0 && (
                         <ul className="absolute z-10 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto">
                             {suggestions.map((food) => (
@@ -158,21 +154,18 @@ const FoodPredictor = () => {
                 <button
                     type="submit"
                     disabled={loading || !selectedFood}
-                    className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all ${loading || !selectedFood ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-600 shadow-green-200'
-                        }`}
+                    className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all ${loading || !selectedFood ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-600 shadow-green-200'}`}
                 >
                     {loading ? 'Menghitung...' : 'Hitung Kalori Sekarang'}
                 </button>
             </form>
 
-            {/* Hasil Prediksi */}
             {result && (
-                <div className="mt-8 p-6 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl text-center shadow-lg">
+                <div className="mt-6 p-5 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl text-center shadow-lg">
                     <p className="text-white text-opacity-80 text-sm font-medium">Hasil Prediksi AI</p>
-                    <h3 className="text-5xl font-black text-white mt-1">
-                        {/* Coba panggil dengan opsional chaining untuk semua kemungkinan struktur */}
+                    <h3 className="text-4xl font-black text-white mt-1">
                         {result.total_calories || result.data?.total_calories || "0"}
-                        <span className="text-lg font-normal ml-2">kcal</span>
+                        <span className="text-sm font-normal ml-2">kcal</span>
                     </h3>
                 </div>
             )}

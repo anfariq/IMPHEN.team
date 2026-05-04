@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -28,11 +29,39 @@ export default function Register() {
 
     // FE VALIDATION
     if (form.password !== form.confirmPassword) {
-      return showToast("Password tidak sama");
+      return toast.error("Password dan konfirmasi password tidak cocok", {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      });
     }
 
     if (form.password.length < 8) {
-      return showToast("Password minimal 8 karakter");
+      return toast.error("Password minimal 8 karakter", {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      });
     }
 
     try {
@@ -62,10 +91,38 @@ export default function Register() {
         throw new Error(data.message || "Register gagal");
       }
 
-      showToast("Register berhasil");
+      toast.success('Registrasi berhasil! Silakan login.', {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#22c55e', // Warna hijau untuk sukses
+          secondary: '#fff',
+        },
+      });
       navigate("/login");
     } catch (err) {
-      showToast(err.message);
+      toast.error(err.message, {
+        duration: 4000,
+        style: {
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          color: '#0f172a',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      });
     } finally {
       setLoading(false);
     }

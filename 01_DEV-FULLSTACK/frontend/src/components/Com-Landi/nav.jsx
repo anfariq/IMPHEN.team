@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   NAV_LINKS
 } from './constants.jsx';
 
 export default function Nav() {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        // Cek apakah token ada di storage untuk menentukan status login
+        const token = localStorage.getItem("token");
+        if (token) {
+            setIsLoggedIn(true);
+        }
+    }, []);
+
     return (
         <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
@@ -18,6 +28,7 @@ export default function Nav() {
               HealthyAI
             </span>
           </div>
+
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((l) => (
               <a
@@ -29,14 +40,17 @@ export default function Nav() {
               </a>
             ))}
           </div>
+
+          {/* Desktop Button */}
           <div className="hidden md:flex items-center">
             <a
-              href="/login"
+              href={isLoggedIn ? "/dashboard" : "/login"}
               className="text-sm font-semibold bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors inline-block"
             >
-              Mulai Gratis
+              {isLoggedIn ? "Dashboard" : "Masuk"}
             </a>
           </div>
+
           <button
             className="md:hidden p-2 rounded-lg hover:bg-slate-100"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -46,6 +60,8 @@ export default function Nav() {
             <div className="w-5 h-0.5 bg-slate-700"></div>
           </button>
         </div>
+
+        {/* Mobile Menu */}
         {mobileOpen && (
           <div className="md:hidden border-t border-slate-100 bg-white px-4 py-4 flex flex-col gap-4">
             {NAV_LINKS.map((l) => (
@@ -57,9 +73,12 @@ export default function Nav() {
                 {l}
               </a>
             ))}
-            <button className="text-sm font-semibold bg-blue-600 text-white px-4 py-2.5 rounded-lg w-full">
-              Mulai Gratis
-            </button>
+            <a 
+              href={isLoggedIn ? "/dashboard" : "/login"}
+              className="text-sm font-semibold bg-blue-600 text-white px-4 py-2.5 rounded-lg w-full text-center"
+            >
+              {isLoggedIn ? "My Dashboard" : "Masuk"}
+            </a>
           </div>
         )}
       </nav>

@@ -1,7 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { Home, Activity, Camera, User, LogOut, Save, Settings } from "lucide-react";
+import { Home, Activity, User, LogOut, Save, Settings, Shield } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import toast from 'react-hot-toast';
+
+
+/* ── fonts ── */
+const FONTS = "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap";
+
+/* ── animation helpers ── */
+const fadeUp = (delay = 0) => ({
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] },
+});
+
+/* ── Nav item ── */
+function NavItem({ icon, label, to, active }) {
+    const navigate = useNavigate();
+    return (
+        <motion.button
+            whileTap={{ scale: 0.87 }}
+            onClick={() => navigate(to)}
+            className={`relative flex flex-col items-center gap-1 px-4 py-2 w-[68px] cursor-pointer border-none bg-transparent ${active ? 'text-blue-600' : 'text-slate-400'}`}
+        >
+            {active && (
+                <motion.div layoutId="navBg" className="absolute inset-0 rounded-2xl bg-blue-50 z-0" />
+            )}
+            <div className={`z-10 transition-transform duration-200 ${active ? 'scale-110' : 'scale-100'}`}>
+                {React.cloneElement(icon, { size: 20, strokeWidth: active ? 2.2 : 1.7 })}
+            </div>
+            <span className={`text-[10px] z-10 ${active ? 'font-bold' : 'font-medium'}`}>{label}</span>
+        </motion.button>
+    );
+}
+
+/* ── Reusable Input ── */
+function InputGroup({ label, ...props }) {
+    return (
+        <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">{label}</label>
+            <input
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all font-mono"
+                {...props}
+                required
+            />
+        </div>
+    );
+}
 
 export default function Profile() {
     const [loading, setLoading] = useState(true);
@@ -32,7 +78,7 @@ export default function Profile() {
             .then((data) => {
                 if (data.user) {
                     setUserInfo(data.user);
-                    setCalculatedAge(data.user.age); // Ambil umur otomatis dari backend
+                    setCalculatedAge(data.user.age);
                 }
                 if (data.profile) {
                     setForm({
@@ -79,182 +125,172 @@ export default function Profile() {
     };
 
     const handleLogout = () => {
-        if (window.confirm("Apakah Anda yakin ingin keluar?")) {
-            localStorage.removeItem("token");
-            navigate("/login");
-        }
+        toast('Sampai jumpa lagi!', {
+            duration: 4000,
+            style: {
+                border: '1px solid #e2e8f0',
+                padding: '16px',
+                color: '#0f172a',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '500',
+            },
+            iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+            },
+        });
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-blue-600 font-bold bg-blue-50">
-                Memuat profil...
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-blue-50 to-white gap-3.5" style={{ fontFamily: "'Sora', sans-serif" }}>
+                <motion.div
+                    animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
+                    className="w-8 h-8 rounded-full border-4 border-blue-200 border-t-blue-600"
+                />
+                <p className="text-blue-400 text-[13px] font-semibold">Memuat profil...</p>
             </div>
         );
     }
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            background: "linear-gradient(160deg, #eff6ff 0%, #ffffff 100%)", // Gradient biru muda ke putih
-            fontFamily: "'DM Sans', -apple-system, sans-serif",
-            paddingBottom: 90,
-        }}>
-            {/* HEADER */}
-            <div style={{
-                background: "#2563eb", // Biru solid
-                padding: "40px 20px 30px",
-                borderBottomLeftRadius: 30,
-                borderBottomRightRadius: 30,
-                color: "white",
-                boxShadow: "0 4px 20px rgba(37, 99, 235, 0.15)"
-            }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Profil Saya</h1>
-                        <p style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>Atur data diri dan target nutrisi</p>
-                    </div>
-                    <div style={{
-                        width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.2)",
-                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20
-                    }}>
-                        <User size={24} color="white" />
-                    </div>
-                </div>
-            </div>
+        <>
+            <link href={FONTS} rel="stylesheet" />
+            <div className="flex flex-col md:flex-row min-h-screen bg-slate-50" style={{ fontFamily: "'Sora', -apple-system, sans-serif" }}>
 
-            <div style={{ padding: "0 20px", marginTop: -15 }}>
-                {/* INFO AKUN */}
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{
-                    background: "white", borderRadius: 20, padding: "20px",
-                    boxShadow: "0 4px 15px rgba(0,0,0,0.05)", marginBottom: 20
-                }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-                        <div style={{ background: "#dbeafe", padding: 12, borderRadius: 15 }}>
-                            <Settings size={22} color="#2563eb" />
+                {/* MAIN CONTENT AREA */}
+                <main className="flex-1 pb-24 md:pb-8 md:pl-[90px] w-full">
+
+                    {/* ─── HEADER HERO ─── */}
+                    <motion.div {...fadeUp(0)} className="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-600 pt-[clamp(32px,8vw,48px)] pb-12 px-6 rounded-b-[32px] md:rounded-b-[40px] relative overflow-hidden">
+                        <div className="absolute -top-10 -right-7 w-40 h-40 rounded-full bg-white/5 blur-xl" />
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
+
+                        <div className="max-w-[800px] mx-auto relative z-10">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-xs text-white/80 font-semibold tracking-widest uppercase mb-1">Pengaturan</div>
+                                    <h1 className="text-[clamp(24px,5vw,32px)] font-extrabold text-white tracking-tight">Profil Saya ⚙️</h1>
+                                </div>
+                                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+                                    <User size={24} className="text-white" />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <div style={{ fontSize: 16, fontWeight: 700, color: "#1e3a5f" }}>{userInfo.name || "Pengguna"}</div>
-                            <div style={{ fontSize: 12, color: "#93c5fd" }}>{userInfo.email}</div>
-                        </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
 
-                {/* FORM DATA DIRI */}
-                <form onSubmit={handleSave}>
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} style={{
-                        background: "white", borderRadius: 20, padding: "20px",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.05)", marginBottom: 20
-                    }}>
-                        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#1e3a5f", marginBottom: 15 }}>Metrik Tubuh & Target</h2>
+                    {/* ─── CONTENT GRID ─── */}
+                    <div className="max-w-[800px] mx-auto px-4 md:px-8 -mt-6 relative z-20 flex flex-col gap-5">
 
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15, marginBottom: 15 }}>
-                            <InputGroup label="Berat (kg)" name="weight" type="number" value={form.weight} onChange={handleChange} />
-                            <InputGroup label="Tinggi (cm)" name="height" type="number" value={form.height} onChange={handleChange} />
-                            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>Umur (Otomatis)</label>
-                                <div style={{
-                                    padding: "10px 12px", borderRadius: 10, background: "#f1f5f9",
-                                    fontSize: 14, color: "#475569", border: "1px solid #e2e8f0"
-                                }}>
-                                    {calculatedAge} Tahun
+                        {/* INFO AKUN (READ ONLY) */}
+                        <motion.div {...fadeUp(0.1)} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_4px_20px_rgba(37,99,235,0.04)] p-5 md:p-6 flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shrink-0 border-2 border-white shadow-sm">
+                                <Shield size={24} className="text-blue-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-base font-bold text-slate-900 truncate">{userInfo.name || "Pengguna"}</div>
+                                <div className="text-[13px] text-slate-500 truncate mt-0.5">{userInfo.email}</div>
+                            </div>
+                        </motion.div>
+
+                        {/* FORM DATA DIRI */}
+                        <motion.div {...fadeUp(0.2)} className="bg-white rounded-[24px] border border-slate-100 shadow-[0_4px_20px_rgba(37,99,235,0.04)] p-6 md:p-8">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                                    <Settings size={20} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold text-slate-900">Metrik Tubuh & Target</h2>
+                                    <p className="text-xs text-slate-500">Sesuaikan untuk perhitungan kalori akurat</p>
                                 </div>
                             </div>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>Gender</label>
-                                <select name="gender" value={form.gender} onChange={handleChange} style={inputStyle}>
-                                    <option value="male">Laki-laki</option>
-                                    <option value="female">Perempuan</option>
-                                </select>
-                            </div>
-                        </div>
+                            <form onSubmit={handleSave} className="flex flex-col gap-5">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <InputGroup label="Berat (kg)" name="weight" type="number" step="0.1" value={form.weight} onChange={handleChange} />
+                                    <InputGroup label="Tinggi (cm)" name="height" type="number" value={form.height} onChange={handleChange} />
+                                </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 15 }}>
-                            <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>Tingkat Aktivitas</label>
-                            <select name="activity_level" value={form.activity_level} onChange={handleChange} style={inputStyle}>
-                                <option value="sedentary">Sangat Jarang Olahraga</option>
-                                <option value="light">Jarang (1-3 hari/minggu)</option>
-                                <option value="moderate">Cukup Sering (3-5 hari/minggu)</option>
-                                <option value="active">Sering (6-7 hari/minggu)</option>
-                            </select>
-                        </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Umur (Auto)</label>
+                                        <div className="w-full bg-slate-100 border border-slate-200 text-slate-500 text-[14px] font-medium rounded-2xl px-4 py-3.5 flex items-center font-mono">
+                                            {calculatedAge} <span className="text-xs ml-1 font-sans">Tahun</span>
+                                        </div>
+                                    </div>
 
-                        <InputGroup
-                            label="Target Kalori Harian (kcal)"
-                            name="target_calories"
-                            type="number"
-                            value={form.target_calories}
-                            onChange={handleChange}
-                        />
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Gender</label>
+                                        <select
+                                            name="gender" value={form.gender} onChange={handleChange}
+                                            className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                                        >
+                                            <option value="male">Laki-laki</option>
+                                            <option value="female">Perempuan</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                        <button type="submit" disabled={saving} style={{
-                            width: "100%", background: saving ? "#93c5fd" : "#2563eb", color: "white",
-                            padding: "14px", borderRadius: 14, border: "none", fontWeight: 600, fontSize: 14,
-                            marginTop: 20, display: "flex", justifyContent: "center", alignItems: "center", gap: 8,
-                            cursor: saving ? "not-allowed" : "pointer", transition: "0.2s"
-                        }}>
-                            <Save size={18} />
-                            {saving ? "Menyimpan..." : "Simpan Perubahan"}
-                        </button>
-                    </motion.div>
-                </form>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tingkat Aktivitas</label>
+                                    <select
+                                        name="activity_level" value={form.activity_level} onChange={handleChange}
+                                        className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                                    >
+                                        <option value="sedentary">Sangat Jarang Olahraga</option>
+                                        <option value="light">Jarang (1-3 hari/minggu)</option>
+                                        <option value="moderate">Cukup Sering (3-5 hari/minggu)</option>
+                                        <option value="active">Sering (6-7 hari/minggu)</option>
+                                    </select>
+                                </div>
 
-                {/* LOGOUT BUTTON */}
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                    <button onClick={handleLogout} style={{
-                        width: "100%", background: "#fee2e2", color: "#ef4444",
-                        padding: "14px", borderRadius: 14, border: "none", fontWeight: 600, fontSize: 14,
-                        display: "flex", justifyContent: "center", alignItems: "center", gap: 8, cursor: "pointer"
-                    }}>
-                        <LogOut size={18} />
-                        Keluar dari Akun
-                    </button>
-                </motion.div>
+                                <div className="mt-2">
+                                    <InputGroup label="Target Kalori Harian (kcal)" name="target_calories" type="number" value={form.target_calories} onChange={handleChange} />
+                                </div>
 
+                                <motion.button
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    type="submit"
+                                    disabled={saving}
+                                    className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-[15px] py-4 rounded-2xl shadow-lg shadow-blue-500/25 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                                >
+                                    {saving ? (
+                                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+                                    ) : (
+                                        <>
+                                            <Save size={18} />
+                                            Simpan Perubahan
+                                        </>
+                                    )}
+                                </motion.button>
+                            </form>
+                        </motion.div>
+
+                        {/* LOGOUT BUTTON */}
+                        <motion.div {...fadeUp(0.3)}>
+                            <button onClick={handleLogout} className="w-full bg-white hover:bg-red-50 border border-red-100 text-red-500 font-bold text-[14px] py-4 rounded-[20px] transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <LogOut size={18} />
+                                Keluar dari Akun
+                            </button>
+                        </motion.div>
+
+                    </div>
+                </main>
+
+                {/* ─── NAVBAR / SIDEBAR ─── */}
+                <nav className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around p-2 pb-[max(16px,env(safe-area-inset-bottom))] z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:top-0 md:bottom-0 md:w-[90px] md:flex-col md:justify-start md:py-10 md:border-t-0 md:border-r md:border-slate-200 md:shadow-[4px_0_20px_rgba(0,0,0,0.02)] md:gap-4">
+                    <NavItem icon={<Home />} label="Home" to="/dashboard" active={location.pathname === "/dashboard"} />
+                    <NavItem icon={<Activity />} label="Aktivitas" to="/activity" active={location.pathname === "/activity"} />
+                    <NavItem icon={<User />} label="Profil" to="/profile" active={location.pathname === "/profile"} />
+                </nav>
             </div>
-
-            {/* BOTTOM NAVBAR */}
-            <div style={{
-                position: "fixed", bottom: 0, left: 0, right: 0,
-                background: "rgba(255,255,255,0.92)", backdropFilter: "blur(20px)",
-                borderTop: "1px solid rgba(59,130,246,0.1)",
-                display: "flex", justifyContent: "space-around", padding: "10px 0 20px", zIndex: 100,
-            }}>
-                <NavItem icon={<Home />} label="Home" to="/dashboard" active={location.pathname === "/dashboard"} />
-                <NavItem icon={<Activity />} label="Activity" to="/activity" active={location.pathname === "/activity"} />
-                <NavItem icon={<Camera />} label="Scan" to="/scan" active={location.pathname === "/scan"} />
-                <NavItem icon={<User />} label="Profile" to="/profile" active={location.pathname === "/profile"} />
-            </div>
-        </div>
-    );
-}
-
-// --- Komponen Pendukung Pendek ---
-const inputStyle = {
-    width: "100%", padding: "10px 12px", borderRadius: 10,
-    border: "1px solid #e2e8f0", background: "#f8fafc",
-    fontSize: 14, color: "#1e293b", outline: "none", boxSizing: "border-box"
-};
-
-function InputGroup({ label, ...props }) {
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{label}</label>
-            <input style={inputStyle} {...props} required />
-        </div>
-    );
-}
-
-function NavItem({ icon, label, to, active }) {
-    const navigate = useNavigate();
-    return (
-        <div onClick={() => navigate(to)} style={{
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-            color: active ? "#2563eb" : "#93c5fd", cursor: "pointer"
-        }}>
-            {React.cloneElement(icon, { size: 21, strokeWidth: active ? 2.2 : 1.8 })}
-            <span style={{ fontSize: 10, fontWeight: active ? 600 : 400 }}>{label}</span>
-        </div>
+        </>
     );
 }
