@@ -111,8 +111,8 @@ class User extends Authenticatable
         $fromFormat = "{$senderName} <{$senderEmail}>";
 
         // Tembak langsung ke API Resend
-        $response = \Illuminate\Support\Facades\Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('RESEND_API_KEY'),
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('MAIL_PASSWORD'),
             'Content-Type' => 'application/json',
         ])->post('https://api.resend.com/emails', [
                     'from' => $fromFormat,
