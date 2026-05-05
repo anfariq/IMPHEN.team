@@ -19,6 +19,7 @@ class UserFoodIntake extends Model
         'food_id',
         'qty_grams',      // Jumlah gram yang dimakan
         'total_calories', // Hasil hitung (qty * calories_per_100g / 100)
+        'water',          // Jumlah air yang diminum (dalam ml)
         'consumed_at',    // Tanggal dan waktu makan
     ];
 
