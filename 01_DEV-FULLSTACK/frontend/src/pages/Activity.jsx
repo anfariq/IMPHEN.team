@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Home, Activity as ActivityIcon, User, Flame, Plus, History, ChevronRight } from "lucide-react";
+import { Home, Activity as ActivityIcon, User, Flame, Plus, History, ChevronRight, ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiGet, apiPost } from "../lib/api";
@@ -13,6 +13,18 @@ const fadeUp = (delay = 0) => ({
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] },
 });
+
+/* ── Helper: Cek apakah tanggal adalah hari ini ── */
+const isToday = (dateString) => {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
 
 /* ── Activity row for History ── */
 const ACT_ICONS = ["🏃", "🚴", "🏊", "🏋️", "🚶", "🧘", "🤸", "🧗"];
@@ -75,6 +87,9 @@ export default function Activity() {
   const [form, setForm] = useState({ activity_id: "", duration_minutes: "" });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  
+  // State untuk custom dropdown
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,7 +152,19 @@ export default function Activity() {
     }
   };
 
-  const totalBurned = (records || []).reduce((sum, r) => sum + (r.calories_burned || 0), 0);
+  // Filter records berdasarkan hari ini
+  const todaysRecords = (records || []).filter(r => isToday(r.created_at));
+  const totalBurned = todaysRecords.reduce((sum, r) => sum + (r.calories_burned || 0), 0);
+
+  // Helper untuk mendapatkan nama aktivitas yang dipilih pada dropdown
+  const getSelectedActivityName = () => {
+    if (!form.activity_id) return "Pilih aktivitas...";
+    for (const cat in activities) {
+      const found = activities[cat].find(a => String(a.id) === String(form.activity_id));
+      if (found) return found.name;
+    }
+    return "Pilih aktivitas...";
+  };
 
   if (loading) {
     return (
@@ -154,11 +181,15 @@ export default function Activity() {
   return (
     <>
       <link href={FONTS} rel="stylesheet" />
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}} />
       <div className="flex flex-col md:flex-row min-h-screen bg-slate-50" style={{ fontFamily: "'Sora', -apple-system, sans-serif" }}>
         
-        {/* MAIN CONTENT AREA */}
         <main className="flex-1 pb-24 md:pb-8 md:pl-[90px] w-full">
-          
           {/* ─── HEADER HERO ─── */}
           <motion.div {...fadeUp(0)} className="bg-gradient-to-br from-red-600 via-red-500 to-orange-500 pt-[clamp(32px,8vw,48px)] pb-10 px-6 rounded-b-[32px] md:rounded-b-[40px] relative overflow-hidden">
             <div className="absolute -top-10 -right-7 w-40 h-40 rounded-full bg-white/10 blur-xl" />
@@ -206,26 +237,72 @@ export default function Activity() {
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div>
+                
+                {/* --- CUSTOM DROPDOWN --- */}
+                <div className="relative">
                   <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Jenis Aktivitas</label>
-                  <select
-                    value={form.activity_id}
-                    onChange={(e) => setForm({ ...form, activity_id: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all appearance-none"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                  
+                  {/* Overlay background to close dropdown when clicking outside */}
+                  {isDropdownOpen && (
+                    <div className="fixed inset-0 z-30" onClick={() => setIsDropdownOpen(false)} />
+                  )}
+
+                  <div
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className={`w-full bg-slate-50 border ${isDropdownOpen ? 'border-red-400 ring-4 ring-red-500/10' : 'border-slate-200'} text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 flex items-center justify-between cursor-pointer transition-all relative z-40`}
                   >
-                    <option value="" disabled>Pilih aktivitas...</option>
-                    {Object.keys(activities).map((cat) => (
-                      <optgroup key={cat} label={cat} className="font-bold text-slate-900 bg-white">
-                        {(activities[cat] || []).map((a) => (
-                          <option key={a.id} value={a.id} className="font-medium text-slate-700">
-                            {a.name} (MET: {a.met_value})
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
+                    <span className={!form.activity_id ? "text-slate-400" : "text-slate-800 truncate"}>
+                      {getSelectedActivityName()}
+                    </span>
+                    <ChevronDown size={18} className={`text-slate-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </div>
+
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden"
+                      >
+                        <div className="max-h-[280px] overflow-y-auto custom-scrollbar py-2">
+                          {Object.keys(activities).map((cat) => (
+                            <div key={cat} className="mb-1">
+                              <div className="sticky top-0 bg-white/95 backdrop-blur-md px-4 py-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest z-10">
+                                {cat}
+                              </div>
+                              <div className="flex flex-col">
+                                {(activities[cat] || []).map((a) => (
+                                  <div
+                                    key={a.id}
+                                    onClick={() => {
+                                      setForm({ ...form, activity_id: String(a.id) });
+                                      setIsDropdownOpen(false);
+                                    }}
+                                    className={`px-4 py-3 text-[13px] font-medium cursor-pointer transition-colors flex items-center justify-between ${
+                                      String(form.activity_id) === String(a.id)
+                                        ? "bg-red-50 text-red-600"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                    }`}
+                                  >
+                                    <span className="truncate pr-4">{a.name}</span>
+                                    <span className={`shrink-0 text-[10px] font-bold font-mono px-2 py-1 rounded-lg ${
+                                        String(form.activity_id) === String(a.id) ? "bg-red-100 text-red-600" : "bg-slate-100 text-slate-400"
+                                    }`}>
+                                      MET {a.met_value}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
+                {/* --- END CUSTOM DROPDOWN --- */}
 
                 <div>
                   <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Durasi</label>
@@ -235,7 +312,7 @@ export default function Activity() {
                       placeholder="Contoh: 30"
                       value={form.duration_minutes}
                       onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium font-mono rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium font-mono rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition-all"
                       min="1"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-semibold text-slate-400">menit</span>
@@ -247,7 +324,7 @@ export default function Activity() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={submitting}
-                  className="w-full mt-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold text-[15px] py-4 rounded-2xl shadow-lg shadow-red-500/25 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="w-full mt-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold text-[15px] py-4 rounded-2xl shadow-[0_8px_20px_-8px_rgba(239,68,68,0.5)] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
@@ -258,29 +335,29 @@ export default function Activity() {
               </form>
             </Card>
 
-            {/* RIWAYAT AKTIVITAS */}
+            {/* RIWAYAT AKTIVITAS - HANYA HARI INI */}
             <Card delay={0.2} className="lg:col-span-7 flex flex-col h-full min-h-[400px]">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                     <History size={20} className="text-red-500" />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Riwayat Anda</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Riwayat Anda (Hari Ini)</h2>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto pr-2 -mr-2">
-                {records.length === 0 ? (
+              <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
+                {todaysRecords.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center py-10 opacity-60">
                     <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                       <ActivityIcon size={32} className="text-slate-400" />
                     </div>
-                    <p className="text-slate-500 font-medium">Belum ada aktivitas yang dicatat.</p>
+                    <p className="text-slate-500 font-medium">Belum ada aktivitas yang dicatat hari ini.</p>
                     <p className="text-sm text-slate-400 mt-1">Ayo mulai bergerak hari ini!</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-1">
-                    {records.map((r, i) => (
+                    {todaysRecords.map((r, i) => (
                       <ActivityRow
                         key={r.id}
                         index={i}
