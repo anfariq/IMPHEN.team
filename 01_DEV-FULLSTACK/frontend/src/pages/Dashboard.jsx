@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X } from "lucide-react";
-import FoodPredictor from "./Foods"; 
+import FoodPredictor from "./Foods";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiGet } from "../lib/api"; // <-- Tambahkan import apiGet di sini
@@ -165,9 +165,9 @@ function NavItem({ icon, label, to, active }) {
 /* ── Section card ── */
 function Card({ children, delay = 0, className = "", onClick }) {
   return (
-    <motion.div 
-      {...fadeUp(delay)} 
-      onClick={onClick} 
+    <motion.div
+      {...fadeUp(delay)}
+      onClick={onClick}
       className={`bg-white rounded-[22px] border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(37,99,235,0.04)] p-5 ${className}`}
     >
       {children}
@@ -206,10 +206,10 @@ const isYesterday = (dateString) => {
   if (!dateString) return false;
   const date = new Date(dateString);
   const yesterday = new Date();
-  
+
   // Kurangi 1 hari dari hari ini untuk mendapatkan tanggal kemarin
   yesterday.setDate(yesterday.getDate() - 1);
-  
+
   return (
     date.getDate() === yesterday.getDate() &&
     date.getMonth() === yesterday.getMonth() &&
@@ -244,9 +244,9 @@ export default function Dashboard() {
             'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
           },
         }).then(r => r.json()),
-        
+
         // Memanfaatkan apiGet untuk mengambil raw records riwayat
-        apiGet("/activities/record", token).catch(() => []) 
+        apiGet("/activities/record", token).catch(() => [])
       ]);
 
       // Ambil array record (mencegah error jika data kosong)
@@ -262,10 +262,10 @@ export default function Dashboard() {
 
       const normalized = {
         calories_today: dashRes?.today?.total_calories_in || dashRes?.today?.calories_in || 0,
-        
+
         // Prioritaskan perhitungan dari validitas hari ini, jika 0 pakai fallback dashboard
         calories_burned: todayBurned > 0 ? todayBurned : (dashRes?.today?.total_calories_out || dashRes?.today?.calories_out || 0),
-        
+
         calorie_goal: dashRes?.target_calories || 2000,
         macros: {
           protein: dashRes?.today?.protein || 0,
@@ -274,7 +274,7 @@ export default function Dashboard() {
         },
         water: { current: dashRes?.today?.water ?? 0, goal: 8 },
         recent_meals: dashRes?.today?.meals || [],
-        
+
         // Gunakan aktivitas yang sudah di filter
         recent_activities: todayActivities.length > 0 ? todayActivities : (dashRes?.today?.activities || []),
         yesterday_activities: yesterdayActivities,
@@ -427,8 +427,8 @@ export default function Dashboard() {
                 <div className="w-14 h-14 rounded-[16px] bg-sky-100 flex items-center justify-center mb-4">
                   <Apple size={28} className="text-sky-500" />
                 </div>
-                <div className="text-base font-bold text-slate-900">Input makanan anda</div>
-                <div className="text-[13px] text-slate-500 mt-1">Catat kalori & nutrisi masuk</div>
+                <div className="text-base font-bold text-slate-900">Catat Makan & Minum</div>
+                <div className="text-[13px] text-slate-500 mt-1">Pantau kalori, nutrisi, & hidrasi</div>
               </Card>
             </div>
 
@@ -459,7 +459,7 @@ export default function Dashboard() {
 
             {/* RECENT MEALS */}
             <Card delay={0.26} className="lg:col-span-2">
-              <SectionHeader title="Makan Hari Ini" action="Lihat semua" onClick={() => navigate("/foods")} />
+              <SectionHeader title="Makan Hari Ini" action="Lihat semua" /> {/* onClick={() => navigate("/foods")}  */}
               {data.recent_meals.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">🍽️</div>
