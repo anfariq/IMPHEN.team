@@ -54,25 +54,34 @@ class FoodController extends Controller
 
     public function store(Request $request)
     {
+        // Ubah menjadi nullable agar bisa saling independen
         $validated = $request->validate([
-            'food_id' => 'required|exists:foods,id',
-            'qty_grams' => 'required|numeric',
-            'total_calories' => 'required|numeric',
+            'food_id' => 'nullable|exists:foods,id',
+            'qty_grams' => 'nullable|numeric',
+            'total_calories' => 'nullable|numeric',
             'water' => 'nullable|integer',
         ]);
 
+        // Cek apakah minimal ada data makanan ATAU data air yang dikirim
+        if (empty($validated['food_id']) && empty($validated['water'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Harus mengisi makanan atau air minum.'
+            ], 422);
+        }
+
         $intake = UserFoodIntake::create([
-            'user_id' => $request->user()->id, // Ambil ID dari token login
-            'food_id' => $validated['food_id'],
-            'qty_grams' => $validated['qty_grams'],
-            'total_calories' => $validated['total_calories'],
-            'water' => $validated['water'],
-            'consumed_at' => now(), // Otomatis set waktu sekarang
+            'user_id' => $request->user()->id,
+            'food_id' => $validated['food_id'] ?? null, // Jika null, biarkan null
+            'qty_grams' => $validated['qty_grams'] ?? 0, // Jika tidak ada, isi 0
+            'total_calories' => $validated['total_calories'] ?? 0,
+            'water' => $validated['water'] ?? 0, // Jika tidak ada, isi 0
+            'consumed_at' => now(),
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Data makan berhasil disimpan!',
+            'message' => 'Data berhasil disimpan!',
             'data' => $intake
         ], 201);
     }
