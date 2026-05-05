@@ -39,7 +39,7 @@ class AuthController extends Controller
             'weight' => 0,
             'height' => 0,
             'age' => 0,
-            'gender' => 'male',
+            'gender' => $request->gender,
             'activity_level' => 'sedentary'
         ]);
 
@@ -100,7 +100,7 @@ class AuthController extends Controller
     public function showProfile(Request $request)
     {
         $user = $request->user();
-        
+
         return response()->json([
             'user' => [
                 'name' => $user->name,
@@ -114,30 +114,46 @@ class AuthController extends Controller
     // Memperbarui data profil
     public function updateProfile(Request $request)
     {
+        // 1. Ubah validasi menjadi 'nullable' agar mengizinkan data kosong/tidak dikirim
         $request->validate([
-            'weight' => 'required|numeric|min:1',
-            'height' => 'required|numeric|min:1',
-            'gender' => 'required|in:male,female',
-            'activity_level' => 'required|string',
-            'target_calories' => 'required|numeric|min:500',
+            'weight' => 'nullable|numeric|min:1',
+            'height' => 'nullable|numeric|min:1',
+            'gender' => 'nullable|in:male,female',
+            'activity_level' => 'nullable|string',
+            'target_calories' => 'nullable|numeric|min:500',
         ]);
 
         $user = $request->user();
 
-        // Update data profilnya
-        $profile = Profile::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'weight' => $request->weight,
-                'height' => $request->height,
-                'age' => $user->age,
-                'gender' => $request->gender,
-                'activity_level' => $request->activity_level,
-                'target_calories' => $request->target_calories,
-            ]
-        );
+        // 2. Cari profil yang sudah ada, atau buat instance baru jika belum pernah ada
+        $profile = Profile::firstOrNew(['user_id' => $user->id]);
+
+        // 3. Update HANYA kolom yang dikirim dari Frontend
+        // Jika tidak dikirim (null), maka data lama di database tidak akan tertimpa/hilang
+        if ($request->has('weight') && $request->weight != null) {
+            $profile->weight = $request->weight;
+        }
+        if ($request->has('height') && $request->height != null) {
+            $profile->height = $request->height;
+        }
+        if ($request->has('gender') && $request->gender != null) {
+            $profile->gender = $request->gender;
+        }
+        if ($request->has('activity_level') && $request->activity_level != null) {
+            $profile->activity_level = $request->activity_level;
+        }
+        if ($request->has('target_calories') && $request->target_calories != null) {
+            $profile->target_calories = $request->target_calories;
+        }
+
+        // Selalu sinkronkan umur dari tabel user (seperti kode Nona Muda sebelumnya)
+        $profile->age = $user->age;
+
+        // 4. Simpan ke database
+        $profile->save();
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Profil berhasil diperbarui!',
             'profile' => $profile
         ]);
