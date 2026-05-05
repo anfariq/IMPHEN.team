@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X } from "lucide-react";
-import FoodPredictor from "./Foods"; // Pastikan path import ini sesuai dengan lokasi file foods.jsx Anda
+import FoodPredictor from "./Foods"; 
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { apiGet } from "../lib/api"; // <-- Tambahkan import apiGet di sini
 
 /* ── fonts ── */
 const FONTS = "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap";
@@ -162,7 +163,6 @@ function NavItem({ icon, label, to, active }) {
 }
 
 /* ── Section card ── */
-/* ── Section card ── */
 function Card({ children, delay = 0, className = "", onClick }) {
   return (
     <motion.div 
@@ -189,6 +189,34 @@ function SectionHeader({ title, action, actionColor = "text-blue-600", onClick }
   );
 }
 
+/* ── Helper: Cek apakah tanggal adalah hari ini ── */
+const isToday = (dateString) => {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+/* ── Helper: Cek apakah tanggal adalah kemarin ── */
+const isYesterday = (dateString) => {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  const yesterday = new Date();
+  
+  // Kurangi 1 hari dari hari ini untuk mendapatkan tanggal kemarin
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  return (
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+  );
+};
+
 /* ════════════════════════════════
    MAIN DASHBOARD
 ════════════════════════════════ */
@@ -196,43 +224,70 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showYesterdayAct, setShowYesterdayAct] = useState(false);
-  const [showFoodModal, setShowFoodModal] = useState(false); // <-- State baru ini
+  const [showFoodModal, setShowFoodModal] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Pisahkan fungsi fetch agar bisa dipanggil ulang setelah makanan ditambahkan
-  const fetchDashboardData = () => {
+  // Diubah menjadi async untuk memanggil API secara paralel dan memfilter secara ketat
+  const fetchDashboardData = async () => {
     const token = localStorage.getItem("token");
     if (!token) { window.location.href = "/login"; return; }
 
-    fetch("https://gateforlaravl.vercel.app/api/dashboard", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Accept': 'application/json',
-        'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        const normalized = {
-          calories_today: res?.today?.total_calories_in || res?.today?.calories_in || 0,
-          calories_burned: res?.today?.total_calories_out || res?.today?.calories_out || 0,
-          calorie_goal: res?.target_calories || 2000,
-          macros: {
-            protein: res?.today?.protein || 0,
-            carbs: res?.today?.carbs || 0,
-            fat: res?.today?.fat || 0,
+    try {
+      // Panggil Dashboard API dan Record API secara bersamaan
+      const [dashRes, recordsRes] = await Promise.all([
+        fetch("https://gateforlaravl.vercel.app/api/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Accept': 'application/json',
+            'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
           },
-          water: { current: res?.today?.water ?? 0, goal: 8 },
-          recent_meals: res?.today?.meals || [],
-          recent_activities: res?.today?.activities || [],
-          yesterday_activities: res?.yesterday?.activities || [],
-          yesterday_calories_burned: res?.yesterday?.total_calories_out || res?.yesterday?.calories_out || 0,
-        };
-        setData(normalized);
-        setLoading(false);
-      })
+        }).then(r => r.json()),
+        
+        // Memanfaatkan apiGet untuk mengambil raw records riwayat
+        apiGet("/activities/record", token).catch(() => []) 
+      ]);
+
+      // Ambil array record (mencegah error jika data kosong)
+      const allRecords = Array.isArray(recordsRes) ? recordsRes : (recordsRes?.data || []);
+
+      // Filter ketat menggunakan helper yang sudah dibuat
+      const todayActivities = allRecords.filter(a => isToday(a.created_at));
+      const yesterdayActivities = allRecords.filter(a => isYesterday(a.created_at));
+
+      // Hitung manual berdasarkan data valid
+      const todayBurned = todayActivities.reduce((sum, a) => sum + (a.calories_burned || a.burned || 0), 0);
+      const yesterdayBurned = yesterdayActivities.reduce((sum, a) => sum + (a.calories_burned || a.burned || 0), 0);
+
+      const normalized = {
+        calories_today: dashRes?.today?.total_calories_in || dashRes?.today?.calories_in || 0,
+        
+        // Prioritaskan perhitungan dari validitas hari ini, jika 0 pakai fallback dashboard
+        calories_burned: todayBurned > 0 ? todayBurned : (dashRes?.today?.total_calories_out || dashRes?.today?.calories_out || 0),
+        
+        calorie_goal: dashRes?.target_calories || 2000,
+        macros: {
+          protein: dashRes?.today?.protein || 0,
+          carbs: dashRes?.today?.carbs || 0,
+          fat: dashRes?.today?.fat || 0,
+        },
+        water: { current: dashRes?.today?.water ?? 0, goal: 8 },
+        recent_meals: dashRes?.today?.meals || [],
+        
+        // Gunakan aktivitas yang sudah di filter
+        recent_activities: todayActivities.length > 0 ? todayActivities : (dashRes?.today?.activities || []),
+        yesterday_activities: yesterdayActivities,
+        yesterday_calories_burned: yesterdayBurned,
+      };
+
+      setData(normalized);
+      setLoading(false);
+
+    } catch (error) {
+      console.error("Gagal memuat data Dashboard:", error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
