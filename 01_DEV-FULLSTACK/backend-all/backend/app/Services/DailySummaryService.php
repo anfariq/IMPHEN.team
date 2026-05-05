@@ -23,7 +23,12 @@ class DailySummaryService
             ->whereDate('created_at', $date)
             ->sum('calories_burned');
 
-        // 3. Ambil total Nutrisi (Protein, Carbs, Fat) 
+        // 3. Hitung total AIR MINUM (dari penjumlahan kolom water)
+        $totalWater = UserFoodIntake::where('user_id', $userId)
+            ->whereDate('consumed_at', $date)
+            ->sum('water');
+
+        // 4. Ambil total Nutrisi (Protein, Carbs, Fat) 
         // Ini opsional, tapi bagus buat ngisi kolom protein/carbs/fat di daily_summaries lo
         $nutrients = UserFoodIntake::join('foods', 'user_food_intakes.food_id', '=', 'foods.id')
             ->where('user_food_intakes.user_id', $userId)
@@ -39,6 +44,7 @@ class DailySummaryService
             [
                 'calories_in' => (int) round($totalIn),
                 'calories_out' => (int) round($totalOut),
+                'water' => (int) $totalWater,
                 'protein' => (int) round($nutrients->total_protein ?? 0),
                 'carbs' => (int) round($nutrients->total_carbs ?? 0),
                 'fat' => (int) round($nutrients->total_fat ?? 0),

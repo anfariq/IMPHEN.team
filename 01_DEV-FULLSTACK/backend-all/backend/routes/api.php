@@ -42,7 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/foods', [FoodController::class, 'store']);
     Route::get('/foods/{food}', [FoodController::class, 'show']);
 
+    // Catatan Makan (Intake)
     Route::post('/food-intake', [IntakeController::class, 'store']);
+
+    // Endpoint khusus untuk mencatat air minum (water intake)
+    Route::post('/water', [IntakeController::class, 'storeWater']);
 
     // Catatan Makan (Intake)
     Route::post('/intakes', [IntakeController::class, 'store']);

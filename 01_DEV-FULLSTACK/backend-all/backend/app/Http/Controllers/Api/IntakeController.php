@@ -35,6 +35,7 @@ class IntakeController extends Controller
                 'food_id' => $request->food_id,
                 'qty_grams' => $request->qty_grams,
                 'total_calories' => $request->total_calories,
+                'water' => 0, // Jika tidak ada input water, default ke 0
                 'consumed_at' => $request->consumed_at ?? now(),
             ]);
 
@@ -49,6 +50,33 @@ class IntakeController extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    // --- 2. ENDPOINT KHUSUS AIR MINUM ---
+    public function storeWater(Request $request)
+    {
+        try {
+            $request->validate([
+                'water' => 'required|integer|min:1',
+            ]);
+
+            $intake = UserFoodIntake::create([
+                'user_id' => $request->user()->id,
+                'food_id' => null, // Sengaja null karena ini bukan makanan
+                'qty_grams' => 0,
+                'total_calories' => 0,
+                'water' => $request->water,
+                'consumed_at' => now(),
+            ]);
+
+            // Trigger update summary
+            $this->summaryService->updateDailySummary($request->user()->id);
+
+            return response()->json(['status' => 'success', 'message' => 'Air minum tercatat!', 'data' => $intake]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 }
