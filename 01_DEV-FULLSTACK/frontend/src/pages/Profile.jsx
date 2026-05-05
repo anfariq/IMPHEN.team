@@ -84,7 +84,7 @@ export default function Profile() {
                     setForm({
                         weight: data.profile.weight || "",
                         height: data.profile.height || "",
-                        gender: data.profile.gender || "male",
+                        gender: data.profile.gender || "",
                         activity_level: data.profile.activity_level || "sedentary",
                         target_calories: data.profile.target_calories || 2000,
                     });
@@ -107,6 +107,7 @@ export default function Profile() {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
+                    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
                 },
                 body: JSON.stringify(form),
             });
