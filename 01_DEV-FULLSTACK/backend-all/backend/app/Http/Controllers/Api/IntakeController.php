@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserFoodIntake;
-use App\Models\UserWaterIntake; // <-- IMPORT MODEL BARU
+use App\Models\UserWaterIntake; // <-- IMPORT MODEL Water Intake
 use App\Services\CalorieService;
 use App\Services\DailySummaryService;
 use Illuminate\Http\Request;
