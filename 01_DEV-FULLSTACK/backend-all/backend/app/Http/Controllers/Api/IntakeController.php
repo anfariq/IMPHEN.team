@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserFoodIntake;
-use App\Models\Food;
+use App\Models\UserWaterIntake; // <-- IMPORT MODEL BARU
 use App\Services\CalorieService;
 use App\Services\DailySummaryService;
 use Illuminate\Http\Request;
@@ -20,6 +20,7 @@ class IntakeController extends Controller
         $this->summaryService = $ds;
     }
 
+    // --- ENDPOINT MAKANAN (Kembali Ketat) ---
     public function store(Request $request)
     {
         try {
@@ -35,25 +36,19 @@ class IntakeController extends Controller
                 'food_id' => $request->food_id,
                 'qty_grams' => $request->qty_grams,
                 'total_calories' => $request->total_calories,
-                'water' => 0, // Jika tidak ada input water, default ke 0
                 'consumed_at' => $request->consumed_at ?? now(),
             ]);
 
-            // Trigger update summary
             $this->summaryService->updateDailySummary($request->user()->id);
 
             return response()->json(['status' => 'success', 'data' => $intake]);
 
         } catch (\Exception $e) {
-            // Ini akan memunculkan pesan error asli kalau ada yang salah di database/service
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
-    // --- 2. ENDPOINT KHUSUS AIR MINUM ---
+    // --- ENDPOINT AIR MINUM (Pakai Tabel Baru) ---
     public function storeWater(Request $request)
     {
         try {
@@ -61,11 +56,9 @@ class IntakeController extends Controller
                 'water' => 'required|integer|min:1',
             ]);
 
-            $intake = UserFoodIntake::create([
+            // SIMPAN KE TABEL BARU
+            $waterIntake = UserWaterIntake::create([
                 'user_id' => $request->user()->id,
-                'food_id' => null, // Sengaja null karena ini bukan makanan
-                'qty_grams' => 0,
-                'total_calories' => 0,
                 'water' => $request->water,
                 'consumed_at' => now(),
             ]);
@@ -73,7 +66,11 @@ class IntakeController extends Controller
             // Trigger update summary
             $this->summaryService->updateDailySummary($request->user()->id);
 
-            return response()->json(['status' => 'success', 'message' => 'Air minum tercatat!', 'data' => $intake]);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Air minum tercatat!', 
+                'data' => $waterIntake
+            ]);
 
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
