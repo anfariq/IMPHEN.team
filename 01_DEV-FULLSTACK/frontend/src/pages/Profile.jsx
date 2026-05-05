@@ -105,8 +105,8 @@ export default function Profile() {
             const response = await fetch("https://gateforlaravl.vercel.app/api/profile", {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
+                    'Accept': 'application/json',
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
                 },
                 body: JSON.stringify(form),
