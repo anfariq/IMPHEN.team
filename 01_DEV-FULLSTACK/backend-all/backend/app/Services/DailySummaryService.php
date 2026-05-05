@@ -44,7 +44,7 @@ class DailySummaryService
             [
                 'calories_in' => (int) round($totalIn),
                 'calories_out' => (int) round($totalOut),
-                'water' => (int) $totalWater, // Simpan total air ke dashboard
+                'water' => (int) round($totalWater), // Simpan total air ke dashboard
                 'protein' => (int) round($nutrients->total_protein ?? 0),
                 'carbs' => (int) round($nutrients->total_carbs ?? 0),
                 'fat' => (int) round($nutrients->total_fat ?? 0),
