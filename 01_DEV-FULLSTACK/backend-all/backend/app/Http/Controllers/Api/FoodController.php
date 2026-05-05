@@ -58,6 +58,7 @@ class FoodController extends Controller
             'food_id' => 'required|exists:foods,id',
             'qty_grams' => 'required|numeric',
             'total_calories' => 'required|numeric',
+            'water' => 'nullable|integer',
         ]);
 
         $intake = UserFoodIntake::create([
@@ -65,6 +66,7 @@ class FoodController extends Controller
             'food_id' => $validated['food_id'],
             'qty_grams' => $validated['qty_grams'],
             'total_calories' => $validated['total_calories'],
+            'water' => $validated['water'],
             'consumed_at' => now(), // Otomatis set waktu sekarang
         ]);
 
