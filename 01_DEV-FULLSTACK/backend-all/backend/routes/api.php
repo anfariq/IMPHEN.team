@@ -34,7 +34,7 @@ Route::get('/foods', [FoodController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     // Profil User
     Route::get('/profile', [AuthController::class, 'showProfile']);
-    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Makanan (CRUD & Search)
