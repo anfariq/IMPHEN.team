@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from 'react-hot-toast';
 
-
 /* ── fonts ── */
 const FONTS = "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap";
 
@@ -56,7 +55,7 @@ export default function Profile() {
     const [form, setForm] = useState({
         weight: "",
         height: "",
-        gender: "male",
+        gender: "",
         activity_level: "sedentary",
         target_calories: "",
     });
@@ -71,6 +70,7 @@ export default function Profile() {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
             },
         })
@@ -103,23 +103,77 @@ export default function Profile() {
 
         try {
             const response = await fetch("https://gateforlaravl.vercel.app/api/profile", {
-                method: "PUT",
+                method: "POST", // Murni POST sesuai backend
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
                 },
-                body: JSON.stringify(form),
+                body: JSON.stringify(form), // Murni form Nona Muda tanpa disisipi _method PUT
             });
 
             if (response.ok) {
-                alert("Profil berhasil diperbarui!");
+                toast.success('Profil berhasil diperbarui!', {
+                    duration: 4000,
+                    style: {
+                        border: '1px solid #e2e8f0',
+                        padding: '16px',
+                        color: '#0f172a',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                    },
+                    iconTheme: {
+                        primary: '#22c55e',
+                        secondary: '#fff',
+                    },
+                });
+                // Refresh data profil setelah update
+                const updatedProfile = await response.json();
+                if (updatedProfile.profile) {
+                    setForm({
+                        weight: updatedProfile.profile.weight || "",
+                        height: updatedProfile.profile.height || "",
+                        gender: updatedProfile.profile.gender || "",
+                        activity_level: updatedProfile.profile.activity_level || "sedentary",
+                        target_calories: updatedProfile.profile.target_calories || 2000,
+                    });
+                }
             } else {
-                alert("Gagal memperbarui profil. Periksa kembali isian Anda.");
+                toast.error('Gagal memperbarui profil. Periksa kembali isian Anda.', {
+                    duration: 4000,
+                    style: {
+                        border: '1px solid #e2e8f0',
+                        padding: '16px',
+                        color: '#0f172a',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                    },
+                    iconTheme: {
+                        primary: '#ef4444',
+                        secondary: '#fff',
+                    },
+                });
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan jaringan.");
+            toast.error('Terjadi kesalahan jaringan.', {
+                duration: 4000,
+                style: {
+                    border: '1px solid #e2e8f0',
+                    padding: '16px',
+                    color: '#0f172a',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                },
+                iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#fff',
+                },
+            });
         } finally {
             setSaving(false);
         }
@@ -217,38 +271,76 @@ export default function Profile() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
+                                    {/* KOLOM UMUR (AUTO & READ-ONLY) */}
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Umur (Auto)</label>
-                                        <div className="w-full bg-slate-100 border border-slate-200 text-slate-500 text-[14px] font-medium rounded-2xl px-4 py-3.5 flex items-center font-mono">
-                                            {calculatedAge} <span className="text-xs ml-1 font-sans">Tahun</span>
+                                        <div className="w-full bg-slate-50/50 border border-slate-200/60 text-slate-500 text-[14px] font-medium rounded-2xl px-4 py-3.5 flex items-center justify-between font-mono cursor-not-allowed transition-all">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-slate-700 font-bold">{calculatedAge}</span>
+                                                <span className="text-[11px] font-sans text-slate-400 uppercase tracking-wider mt-0.5">Tahun</span>
+                                            </div>
+                                            {/* Indikator Read-only kecil */}
+                                            <div className="w-2 h-2 rounded-full bg-slate-300"></div>
                                         </div>
                                     </div>
 
+                                    {/* KOLOM GENDER (SEGMENTED CONTROL) */}
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Gender</label>
-                                        <select
-                                            name="gender" value={form.gender} onChange={handleChange}
-                                            className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all appearance-none"
-                                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
-                                        >
-                                            <option value="male">Laki-laki</option>
-                                            <option value="female">Perempuan</option>
-                                        </select>
+                                        <div className="w-full flex p-1.5 bg-slate-100 border border-slate-200/60 rounded-2xl h-[50px]">
+                                            <button
+                                                type="button"
+                                                onClick={() => setForm({ ...form, gender: "male" })}
+                                                className={`flex-1 flex items-center justify-center text-[13px] font-bold rounded-xl transition-all duration-300 ${form.gender === "male"
+                                                    ? "bg-white text-blue-600 shadow-[0_2px_12px_rgba(37,99,235,0.08)]"
+                                                    : "text-slate-400 hover:text-slate-600"
+                                                    }`}
+                                            >
+                                                Laki-laki
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setForm({ ...form, gender: "female" })}
+                                                className={`flex-1 flex items-center justify-center text-[13px] font-bold rounded-xl transition-all duration-300 ${form.gender === "female"
+                                                    ? "bg-white text-pink-500 shadow-[0_2px_12px_rgba(236,72,153,0.08)]"
+                                                    : "text-slate-400 hover:text-slate-600"
+                                                    }`}
+                                            >
+                                                Perempuan
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col gap-1.5">
+                                <div className="flex flex-col gap-2.5 mt-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tingkat Aktivitas</label>
-                                    <select
-                                        name="activity_level" value={form.activity_level} onChange={handleChange}
-                                        className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] font-medium rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
-                                    >
-                                        <option value="sedentary">Sangat Jarang Olahraga</option>
-                                        <option value="light">Jarang (1-3 hari/minggu)</option>
-                                        <option value="moderate">Cukup Sering (3-5 hari/minggu)</option>
-                                        <option value="active">Sering (6-7 hari/minggu)</option>
-                                    </select>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[
+                                            { value: "sedentary", title: "Sangat Jarang", desc: "Minim olahraga" },
+                                            { value: "light", title: "Jarang", desc: "1-3 hari/minggu" },
+                                            { value: "moderate", title: "Cukup Sering", desc: "3-5 hari/minggu" },
+                                            { value: "active", title: "Sering", desc: "6-7 hari/minggu" },
+                                        ].map((level) => (
+                                            <button
+                                                key={level.value}
+                                                type="button"
+                                                onClick={() => setForm({ ...form, activity_level: level.value })}
+                                                className={`flex flex-col items-start p-3.5 rounded-2xl border text-left transition-all duration-300 ${form.activity_level === level.value
+                                                        ? "bg-blue-50/70 border-blue-500 shadow-[0_4px_15px_rgba(37,99,235,0.1)] scale-[1.02]"
+                                                        : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                                                    }`}
+                                            >
+                                                <span className={`text-[13px] font-bold transition-colors ${form.activity_level === level.value ? 'text-blue-700' : 'text-slate-700'
+                                                    }`}>
+                                                    {level.title}
+                                                </span>
+                                                <span className={`text-[11px] mt-1 transition-colors ${form.activity_level === level.value ? 'text-blue-500 font-medium' : 'text-slate-500'
+                                                    }`}>
+                                                    {level.desc}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="mt-2">
