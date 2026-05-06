@@ -116,8 +116,8 @@ class AuthController extends Controller
     {
         // 1. Ubah validasi menjadi 'nullable' agar mengizinkan data kosong/tidak dikirim
         $request->validate([
-            'weight' => 'nullable|numeric|min:1',
-            'height' => 'nullable|numeric|min:1',
+            'weight' => 'nullable|numeric|min:0',
+            'height' => 'nullable|numeric|min:0',
             'gender' => 'nullable|in:male,female',
             'activity_level' => 'nullable|string',
             'target_calories' => 'nullable|numeric|min:500',
