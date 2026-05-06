@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X } from "lucide-react";
+import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X, CalendarDays } from "lucide-react";
 import FoodPredictor from "./Foods";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -586,6 +586,7 @@ export default function Dashboard() {
         <nav className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around p-2 pb-[max(16px,env(safe-area-inset-bottom))] z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:top-0 md:bottom-0 md:w-[90px] md:flex-col md:justify-start md:py-10 md:border-t-0 md:border-r md:border-slate-200 md:shadow-[4px_0_20px_rgba(0,0,0,0.02)] md:gap-4">
           <NavItem icon={<Home />} label="Home" to="/dashboard" active={location.pathname === "/dashboard"} />
           <NavItem icon={<Activity />} label="Aktivitas" to="/activity" active={location.pathname === "/activity"} />
+          <NavItem icon={<CalendarDays />} label="Weekly Aktivitas" to="/weekly-activity" active={location.pathname === "/weekly-activity"} />
           <NavItem icon={<User />} label="Profil" to="/profile" active={location.pathname === "/profile"} />
         </nav>
       </div>

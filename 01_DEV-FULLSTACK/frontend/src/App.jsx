@@ -14,6 +14,7 @@ import ResetPassword from './components/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Activity from './pages/Activity'
 import Profile from './pages/Profile'
+import WeeklyActivity from './pages/WeeklyActivity'
 
 // Toast
 import { Toaster } from 'react-hot-toast';
@@ -34,6 +35,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/activity" element={<Activity />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/weekly-activity" element={<WeeklyActivity />} />
         </Routes>
       </BrowserRouter>
     </div>
