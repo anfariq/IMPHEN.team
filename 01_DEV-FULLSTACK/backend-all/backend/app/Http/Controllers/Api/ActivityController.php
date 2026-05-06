@@ -8,6 +8,10 @@ use App\Models\UserActivityBurn;
 use App\Services\CalorieService;
 use App\Services\DailySummaryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+
+use App\Models\DailySummary;
+use App\Models\UserFoodIntake;
 
 class ActivityController extends Controller
 {
@@ -36,14 +40,14 @@ class ActivityController extends Controller
 
         $activity = Activity::find($request->activity_id);
         $user = $request->user();
-        
+
         // Ambil berat badan dari profil, default 60kg jika belum diisi
         $weight = $user->profile->weight ?: 60;
 
         // Hitung kalori terbakar via Service
         $burned = $this->calorieService->calculateActivityBurn(
-            $activity->met_value, 
-            $weight, 
+            $activity->met_value,
+            $weight,
             $request->duration_minutes
         );
 
@@ -70,5 +74,70 @@ class ActivityController extends Controller
             ->get();
 
         return response()->json($records);
+    }
+
+    public function getWeeklyActivity(Request $request)
+    {
+        $user = $request->user();
+
+        // Menentukan rentang waktu: 7 hari terakhir (termasuk hari ini)
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        // 1. Ambil data Ringkasan Harian (Daily Summaries)
+        // Asumsi tabel ini memiliki kolom 'date' (tipe date)
+        $summaries = DailySummary::where('user_id', $user->id)
+            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->get()
+            ->keyBy('date'); // Jadikan tanggal sebagai key array
+
+        // 2. Ambil data Aktivitas/Olahraga
+        // Asumsi tabel menggunakan 'created_at' untuk waktu aktivitas
+        $activities = UserActivityBurn::where('user_id', $user->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($item) {
+                return Carbon::parse($item->created_at)->format('Y-m-d');
+            });
+
+        // 3. Ambil data Konsumsi Makanan
+        $foods = UserFoodIntake::where('user_id', $user->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($item) {
+                return Carbon::parse($item->created_at)->format('Y-m-d');
+            });
+
+        // 4. Format Data agar rapi per hari untuk Frontend
+        $weeklyData = [];
+
+        // Looping dari 6 hari yang lalu sampai hari ini
+        for ($i = 6; $i >= 0; $i--) {
+            $dateString = Carbon::now()->subDays($i)->format('Y-m-d');
+            $dateFormatted = Carbon::now()->subDays($i)->translatedFormat('l, d M Y'); // Contoh: Senin, 01 Mei 2026
+
+            $weeklyData[] = [
+                'date' => $dateString,
+                'date_formatted' => $dateFormatted,
+                // Jika tidak ada summary di hari itu, kembalikan null
+                'summary' => $summaries->get($dateString, null),
+                // Jika tidak ada aktivitas/makanan, kembalikan array kosong
+                'activities' => $activities->get($dateString, []),
+                'foods' => $foods->get($dateString, []),
+            ];
+        }
+
+        // Kembalikan response JSON
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data aktivitas mingguan berhasil diambil.',
+            'data' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'weekly_logs' => array_reverse($weeklyData) // Urutkan dari hari ini ke hari terlama
+            ]
+        ]);
     }
 }

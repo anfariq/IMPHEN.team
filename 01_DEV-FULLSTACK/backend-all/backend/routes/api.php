@@ -56,6 +56,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/activities/record', [ActivityController::class, 'history']);
     Route::post('/activities/record', [ActivityController::class, 'store']);
 
+    // Endpoint untuk mendapatkan data aktivitas mingguan (untuk grafik di React Js)
+    Route::get('/activity/weekly', [ActivityController::class, 'getWeeklyActivity']);
+
     // Dashboard & Grafik
     Route::get('/dashboard', [SummaryController::class, 'getDashboardData']);
 
