@@ -92,21 +92,23 @@ class ActivityController extends Controller
             ->keyBy('date'); // Jadikan tanggal sebagai key array
 
         // 2. Ambil data Aktivitas/Olahraga
-        // Asumsi tabel menggunakan 'created_at' untuk waktu aktivitas
-        $activities = UserActivityBurn::where('user_id', $user->id)
+        // 2. Ambil data Aktivitas/Olahraga dengan Eager Loading
+        $activities = UserActivityBurn::with('activity') // 👈 Tambahkan relasi ini
+            ->where('user_id', $user->id)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->groupBy(function ($item) {
+            ->groupBy(function($item) {
                 return Carbon::parse($item->created_at)->format('Y-m-d');
             });
 
-        // 3. Ambil data Konsumsi Makanan
-        $foods = UserFoodIntake::where('user_id', $user->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // 3. Ambil data Konsumsi Makanan dengan Eager Loading
+        $foods = UserFoodIntake::with('food') // 👈 Tambahkan relasi ini
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$startDate, $endDate]) // Nona Muda juga bisa pakai consumed_at di sini
             ->orderBy('created_at', 'desc')
             ->get()
-            ->groupBy(function ($item) {
+            ->groupBy(function($item) {
                 return Carbon::parse($item->created_at)->format('Y-m-d');
             });
 
