@@ -60,17 +60,6 @@ export default function Footer() {
             <p className="text-xs text-slate-400">
               © 2025 HealthyAI. Dibuat dengan ❤️ untuk Indonesia.
             </p>
-            <div className="flex items-center gap-4">
-              {["Twitter", "Instagram", "TikTok"].map((s) => (
-                <a
-                  key={s}
-                  href="#"
-                  className="text-xs text-slate-400 hover:text-blue-600 transition-colors"
-                >
-                  {s}
-                </a>
-              ))}
-            </div>
           </div>
         </div>
       </footer>
