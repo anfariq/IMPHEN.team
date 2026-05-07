@@ -60,19 +60,22 @@ export const HOW_IT_WORKS = [
 
 export const FEATURES = [
   {
-    title: "AI Food Detection",
-    desc: "Foto makanan Anda dan AI kami langsung mengenali hidangan Indonesia — bahkan warung pinggir jalan.",
-    badge: "Powered by AI",
+    title: "Analitik Progres Akurat",
+    desc: "Pantau surplus atau defisit kalori Anda dengan riwayat aktivitas mingguan yang divisualisasikan dengan rapi dan mudah dipahami.",
+    badge: "Analytics",
     icon: (
       <svg
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         className="w-7 h-7"
       >
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-        <circle cx="12" cy="13" r="4" />
+        {/* Ikon Grafik Garis Naik (Melambangkan peningkatan dan analitik) */}
+        <path d="M3 3v18h18" />
+        <path d="m19 9-5 5-4-4-3 3" />
       </svg>
     ),
   },
@@ -158,7 +161,7 @@ export const TESTIMONIALS = [
   {
     name: "Hendra W.",
     city: "Denpasar",
-    text: "Fitur AI-nya canggih, foto makanan langsung keluar estimasi kalorinya. Keren banget!",
+    text: "Fitur riwayat aktivitas mingguannya juara! Bisa langsung lihat perbandingan kalori konsumsi dan olahraga dengan sangat rapi.",
     avatar: "HW",
   },
   {
@@ -178,19 +181,19 @@ export const TESTIMONIALS = [
 export const FAQS = [
   {
     q: "Apakah data kalori makanan Indonesia akurat?",
-    a: "Ya. Dataset kami dikurasi dari data gizi BPOM, penelitian universitas, dan nutrisi restoran lokal. Kami terus update secara berkala.",
+    a: "Ya. Dataset kami dikurasi dari data gizi BPOM, penelitian universitas, dan nutrisi restoran lokal. Kami akan terus melakukan update secara berkala.",
   },
   {
-    q: "Apakah fitur AI food detection perlu koneksi internet?",
-    a: "Ya, deteksi foto membutuhkan koneksi internet. Namun pencarian dan logging manual bisa dilakukan offline.",
+    q: "Bagaimana cara aplikasi menghitung target kalori saya?",
+    a: "Sistem kami secara otomatis menghitung kebutuhan kalori harian Anda berdasarkan metrik tubuh (berat, tinggi, usia, gender) dan tingkat aktivitas yang Anda atur di halaman Profil.",
   },
   {
     q: "Apakah aplikasinya gratis?",
-    a: "Core features sepenuhnya gratis. Ada fitur premium opsional untuk analisis lebih mendalam dan meal planning AI.",
+    a: "Fitur utama seperti pencatatan makanan, olahraga, dan riwayat aktivitas mingguan sepenuhnya gratis untuk digunakan.",
   },
   {
-    q: "Bagaimana cara menghitung kalori makanan rumahan?",
-    a: "Cukup masukkan nama masakan atau bahan-bahannya. AI kami akan estimasi kalori berdasarkan resep umum Indonesia.",
+    q: "Bagaimana cara menghitung kalori masakan rumahan?",
+    a: "Cukup ketik nama masakan atau bahan-bahannya di pencarian. Sistem kami akan memberikan estimasi kalori berdasarkan standar porsi makanan umum di Indonesia.",
   },
 ];
 
