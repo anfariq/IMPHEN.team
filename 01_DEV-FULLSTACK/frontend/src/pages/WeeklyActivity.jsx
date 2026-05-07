@@ -130,11 +130,10 @@ export default function WeeklyActivity() {
                                         key={day.date}
                                         whileTap={{ scale: 0.95 }}
                                         onClick={() => setSelectedIndex(index)}
-                                        className={`snap-center shrink-0 flex flex-col items-center justify-center w-[64px] h-[80px] rounded-[20px] transition-all duration-300 ${
-                                            isSelected 
-                                            ? "bg-white text-emerald-600 shadow-[0_8px_20px_rgba(16,185,129,0.15)] border-2 border-emerald-500 scale-105" 
-                                            : "bg-white/80 backdrop-blur-md text-slate-500 border border-white/40 shadow-sm hover:bg-white"
-                                        }`}
+                                        className={`snap-center shrink-0 flex flex-col items-center justify-center w-[64px] h-[80px] rounded-[20px] transition-all duration-300 ${isSelected
+                                                ? "bg-white text-emerald-600 shadow-[0_8px_20px_rgba(16,185,129,0.15)] border-2 border-emerald-500 scale-105"
+                                                : "bg-white/80 backdrop-blur-md text-slate-500 border border-white/40 shadow-sm hover:bg-white"
+                                            }`}
                                     >
                                         <span className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isSelected ? 'text-emerald-500' : 'text-slate-400'}`}>
                                             {isToday ? "Kini" : dayName}
@@ -160,7 +159,7 @@ export default function WeeklyActivity() {
                         ) : (
                             <AnimatePresence mode="wait">
                                 <motion.div key={selectedIndex} {...fadeUp(0)} className="flex flex-col gap-5">
-                                    
+
                                     {/* TANGGAL TERPILIH (Label) */}
                                     <div className="flex items-center justify-between">
                                         <h2 className="text-[15px] font-bold text-slate-800">
@@ -168,7 +167,7 @@ export default function WeeklyActivity() {
                                         </h2>
                                     </div>
 
-                                    {/* KARTU SUMMARY (Grid 2 Kolom) */}
+                                    {/* KARTU SUMMARY (Grid 2 Kolom) - KALKULASI OTOMATIS */}
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-white border border-orange-100 rounded-[20px] p-4 flex flex-col shadow-[0_4px_15px_rgba(249,115,22,0.04)] relative overflow-hidden">
                                             <div className="absolute -right-3 -top-3 w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center">
@@ -176,7 +175,10 @@ export default function WeeklyActivity() {
                                             </div>
                                             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Konsumsi</span>
                                             <div className="flex items-end gap-1 mt-1">
-                                                <span className="text-2xl font-extrabold text-orange-500 font-mono leading-none">{activeDay.summary?.total_calories_in || 0}</span>
+                                                {/* Hitung total kalori makanan hari itu */}
+                                                <span className="text-2xl font-extrabold text-orange-500 font-mono leading-none">
+                                                    {activeDay.foods.reduce((sum, item) => sum + (Number(item.total_calories) || 0), 0)}
+                                                </span>
                                                 <span className="text-[11px] font-bold text-orange-400 mb-0.5">kcal</span>
                                             </div>
                                         </div>
@@ -187,34 +189,43 @@ export default function WeeklyActivity() {
                                             </div>
                                             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Terbakar</span>
                                             <div className="flex items-end gap-1 mt-1">
-                                                <span className="text-2xl font-extrabold text-emerald-500 font-mono leading-none">{activeDay.summary?.total_calories_out || 0}</span>
+                                                {/* Hitung total kalori terbakar hari itu */}
+                                                <span className="text-2xl font-extrabold text-emerald-500 font-mono leading-none">
+                                                    {activeDay.activities.reduce((sum, item) => sum + (Number(item.calories_burned) || 0), 0)}
+                                                </span>
                                                 <span className="text-[11px] font-bold text-emerald-400 mb-0.5">kcal</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* LIST MAKANAN */}
-                                    <div className="bg-white rounded-[24px] border border-slate-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                                    <div className="bg-white rounded-[24px] border border-slate-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mt-5">
                                         <div className="flex items-center gap-2 mb-4">
                                             <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center">
                                                 <UtensilsCrossed size={16} className="text-orange-500" />
                                             </div>
                                             <h4 className="text-[14px] font-bold text-slate-800">Catatan Makanan</h4>
                                         </div>
-                                        
+
                                         {activeDay.foods.length === 0 ? (
                                             <div className="bg-slate-50 border border-slate-100 border-dashed rounded-2xl p-4 text-center">
-                                                <span className="text-[12px] text-slate-400 font-medium">Tidak ada makanan dicatat hari ini.</span>
+                                                <span className="text-[12px] text-slate-400 font-medium">Tidak ada makanan dicatat.</span>
                                             </div>
                                         ) : (
                                             <div className="flex flex-col gap-3">
-                                                {activeDay.foods.map((food, i) => (
+                                                {activeDay.foods.map((foodItem, i) => (
                                                     <div key={i} className="flex items-center justify-between group">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-2 h-2 rounded-full bg-orange-300" />
-                                                            <span className="font-semibold text-[13px] text-slate-700">{food.food_name || "Makanan"}</span>
+                                                            {/* Mengambil nama dari relasi tabel food */}
+                                                            <span className="font-semibold text-[13px] text-slate-700">
+                                                                {foodItem.food?.name || "Makanan"}
+                                                            </span>
                                                         </div>
-                                                        <span className="text-[13px] font-bold text-orange-600 bg-orange-50/80 px-2.5 py-1 rounded-lg font-mono">+{food.calories || 0}</span>
+                                                        {/* Menggunakan total_calories sesuai database Nona Muda */}
+                                                        <span className="text-[13px] font-bold text-orange-600 bg-orange-50/80 px-2.5 py-1 rounded-lg font-mono">
+                                                            +{foodItem.total_calories || 0}
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -222,17 +233,17 @@ export default function WeeklyActivity() {
                                     </div>
 
                                     {/* LIST OLAHRAGA */}
-                                    <div className="bg-white rounded-[24px] border border-slate-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                                    <div className="bg-white rounded-[24px] border border-slate-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mt-5">
                                         <div className="flex items-center gap-2 mb-4">
                                             <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center">
                                                 <Flame size={16} className="text-emerald-500" />
                                             </div>
                                             <h4 className="text-[14px] font-bold text-slate-800">Catatan Olahraga</h4>
                                         </div>
-                                        
+
                                         {activeDay.activities.length === 0 ? (
                                             <div className="bg-slate-50 border border-slate-100 border-dashed rounded-2xl p-4 text-center">
-                                                <span className="text-[12px] text-slate-400 font-medium">Tidak ada olahraga dicatat hari ini.</span>
+                                                <span className="text-[12px] text-slate-400 font-medium">Tidak ada olahraga dicatat.</span>
                                             </div>
                                         ) : (
                                             <div className="flex flex-col gap-3">
@@ -241,11 +252,19 @@ export default function WeeklyActivity() {
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-2 h-2 rounded-full bg-emerald-300" />
                                                             <div className="flex flex-col">
-                                                                <span className="font-semibold text-[13px] text-slate-700">{act.activity_name || "Aktivitas"}</span>
-                                                                <span className="text-[11px] text-slate-400 font-medium">{act.duration_minutes || 0} Menit</span>
+                                                                {/* Mengambil nama dari relasi tabel activity */}
+                                                                <span className="font-semibold text-[13px] text-slate-700">
+                                                                    {act.activity?.name || "Aktivitas"}
+                                                                </span>
+                                                                <span className="text-[11px] text-slate-400 font-medium">
+                                                                    {act.duration_minutes || 0} Menit
+                                                                </span>
                                                             </div>
                                                         </div>
-                                                        <span className="text-[13px] font-bold text-emerald-600 bg-emerald-50/80 px-2.5 py-1 rounded-lg font-mono">-{act.calories_burned || 0}</span>
+                                                        {/* Sesuaikan calories_burned jika di DB Nona Muda namanya berbeda */}
+                                                        <span className="text-[13px] font-bold text-emerald-600 bg-emerald-50/80 px-2.5 py-1 rounded-lg font-mono">
+                                                            -{act.calories_burned || 0}
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
