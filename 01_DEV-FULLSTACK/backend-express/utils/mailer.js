@@ -1,0 +1,86 @@
+const { Resend } = require('resend');
+require('dotenv').config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const fromFormat = `${process.env.MAIL_FROM_NAME} <${process.env.MAIL_FROM_ADDRESS}>`;
+
+const sendOtpEmail = async (email, name, otpCode) => {
+    const htmlContent = `
+        <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;'>
+            <h2 style='color: #0f172a; text-align: center;'>Selamat datang di Healthy AI! 🌱</h2>
+            <p style='color: #475569; font-size: 16px;'>Halo <b>${name}</b>,</p>
+            <p style='color: #475569; font-size: 16px;'>Terima kasih telah mendaftar. Untuk menyelesaikan registrasi dan mengaktifkan akun Anda, silakan masukkan kode verifikasi berikut:</p>
+            <div style='text-align: center; margin: 30px 0;'>
+                <span style='font-size: 36px; font-weight: bold; color: #10B981; letter-spacing: 10px; background: #ecfdf5; padding: 15px 30px; border-radius: 8px; display: inline-block;'>${otpCode}</span>
+            </div>
+            <p style='color: #64748b; font-size: 14px;'>Kode ini berlaku untuk sesi ini dan bersifat rahasia. Jangan berikan kode ini kepada siapa pun.</p>
+        </div>
+    `;
+
+    return await resend.emails.send({
+        from: fromFormat,
+        to: [email],
+        subject: 'Kode Verifikasi Akun Healthy AI',
+        html: htmlContent
+    });
+};
+
+const sendResendOtpEmail = async (email, name, otpCode) => {
+    const htmlContent = `
+        <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;'>
+            <h2 style='color: #0f172a; text-align: center;'>Kode OTP Baru Anda 🔄</h2>
+            <p style='color: #475569; font-size: 16px;'>Halo <b>${name}</b>,</p>
+            <p style='color: #475569; font-size: 16px;'>Kami menerima permintaan untuk mengirimkan ulang kode verifikasi Anda. Berikut adalah kode OTP baru Anda:</p>
+            <div style='text-align: center; margin: 30px 0;'>
+                <span style='font-size: 36px; font-weight: bold; color: #3b82f6; letter-spacing: 10px; background: #eff6ff; padding: 15px 30px; border-radius: 8px; display: inline-block;'>${otpCode}</span>
+            </div>
+            <p style='color: #64748b; font-size: 14px;'>Kode ini akan menggantikan kode sebelumnya. Jangan berikan kode ini kepada siapa pun.</p>
+        </div>
+    `;
+    return await resend.emails.send({ from: fromFormat, to: [email], subject: 'Kirim Ulang: Kode Verifikasi Healthy AI', html: htmlContent });
+};
+
+// 3. Email Reset Password
+const sendPasswordResetEmail = async (email, resetLink) => {
+    const currentYear = new Date().getFullYear();
+    const htmlContent = `
+    <div style="background-color: #edf2f7; margin: 0; padding: 50px 0; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+                <td align="center">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 570px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                        <tr>
+                            <td style="padding: 25px 35px; text-align: center;">
+                                <span style="font-size: 19px; font-weight: bold; color: #3d4852;">Healthy App</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 35px; border-top: 1px solid #edeff2; border-bottom: 1px solid #edeff2; background-color: #ffffff;">
+                                <p style="font-size: 16px; color: #718096; margin-bottom: 25px;">Hello!</p>
+                                <p style="font-size: 16px; color: #718096; margin-bottom: 25px;">You are receiving this email because we received a password reset request for your account.</p>
+                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="${resetLink}" style="display: inline-block; padding: 10px 25px; background-color: #2d3748; color: #ffffff; border-radius: 4px; text-decoration: none; font-weight: bold;">Reset Password</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <p style="font-size: 14px; color: #e53e3e; margin-top: 25px; text-align: center; font-weight: 500;">This password reset link will expire in 60 minutes.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 35px; text-align: center;">
+                                <p style="font-size: 12px; color: #b0adc5;">&copy; ${currentYear} Healthy App. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>`;
+
+    return await resend.emails.send({ from: fromFormat, to: [email], subject: 'Reset Password', html: htmlContent });
+};
+
+// Pastikan semua diekspor
+module.exports = { sendOtpEmail, sendResendOtpEmail, sendPasswordResetEmail };
