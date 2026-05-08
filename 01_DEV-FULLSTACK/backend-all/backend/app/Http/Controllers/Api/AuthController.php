@@ -52,7 +52,7 @@ class AuthController extends Controller
                 'gender' => $request->gender,
                 'activity_level' => 'sedentary'
             ]);
-            
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -76,8 +76,9 @@ class AuthController extends Controller
         try {
             Mail::html($htmlContent, function ($message) use ($user) {
                 $message->to($user->email)
-                        ->subject('Kode Verifikasi Akun Healthy AI');
-                // Note: 'from' address akan otomatis diambil dari MAIL_FROM_ADDRESS di .env
+                        ->subject('Kode Verifikasi Akun Healthy AI')
+                        // 👇 Wajib tambahkan ini agar Resend tidak bingung siapa pengirimnya
+                        ->from(env('MAIL_FROM_ADDRESS', 'noreply@ownspace.my.id'), env('MAIL_FROM_NAME', 'Healthy App')); 
             });
         } catch (\Exception $e) {
             // Jika email gagal dikirim (misal koneksi terputus), kembalikan pesan error
@@ -153,7 +154,7 @@ class AuthController extends Controller
 
         // Generate OTP Baru
         $newOtpCode = (string) rand(100000, 999999);
-        
+
         $user->update([
             'otp_code' => $newOtpCode
         ]);
@@ -174,7 +175,9 @@ class AuthController extends Controller
         try {
             Mail::html($htmlContent, function ($message) use ($user) {
                 $message->to($user->email)
-                        ->subject('Kirim Ulang: Kode Verifikasi Healthy AI');
+                    ->subject('Kode Verifikasi Akun Healthy AI')
+                    // 👇 Wajib tambahkan ini agar Resend tidak bingung siapa pengirimnya
+                    ->from(env('MAIL_FROM_ADDRESS', 'noreply@ownspace.my.id'), env('MAIL_FROM_NAME', 'Healthy App'));
             });
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal mengirim ulang email OTP. Silakan coba beberapa saat lagi.'], 500);
