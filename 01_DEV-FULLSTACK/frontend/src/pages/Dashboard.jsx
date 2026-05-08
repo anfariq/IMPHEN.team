@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X, CalendarDays } from "lucide-react";
+import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X, CalendarDays, TrendingUp, TrendingDown, Target, Activity as ActivityIcon } from "lucide-react";
 import FoodPredictor from "./Foods";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { apiGet } from "../lib/api"; // <-- Tambahkan import apiGet di sini
+import { apiGet } from "../lib/api";
+// --- IMPORT RECHARTS UNTUK GRAFIK ---
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from "recharts";
 
 /* ── fonts ── */
 const FONTS = "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap";
@@ -149,10 +151,7 @@ function NavItem({ icon, label, to, active }) {
       className={`relative flex flex-col items-center gap-1 px-4 py-2 w-[68px] cursor-pointer border-none bg-transparent ${active ? 'text-blue-600' : 'text-slate-400'}`}
     >
       {active && (
-        <motion.div
-          layoutId="navBg"
-          className="absolute inset-0 rounded-2xl bg-blue-50 z-0"
-        />
+        <motion.div layoutId="navBg" className="absolute inset-0 rounded-2xl bg-blue-50 z-0" />
       )}
       <div className={`z-10 transition-transform duration-200 ${active ? 'scale-110' : 'scale-100'}`}>
         {React.cloneElement(icon, { size: 20, strokeWidth: active ? 2.2 : 1.7 })}
@@ -175,7 +174,6 @@ function Card({ children, delay = 0, className = "", onClick }) {
   );
 }
 
-/* ── Section header ── */
 function SectionHeader({ title, action, actionColor = "text-blue-600", onClick }) {
   return (
     <div className="flex justify-between items-center mb-4">
@@ -189,32 +187,19 @@ function SectionHeader({ title, action, actionColor = "text-blue-600", onClick }
   );
 }
 
-/* ── Helper: Cek apakah tanggal adalah hari ini ── */
 const isToday = (dateString) => {
   if (!dateString) return false;
   const date = new Date(dateString);
   const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
+  return (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear());
 };
 
-/* ── Helper: Cek apakah tanggal adalah kemarin ── */
 const isYesterday = (dateString) => {
   if (!dateString) return false;
   const date = new Date(dateString);
   const yesterday = new Date();
-
-  // Kurangi 1 hari dari hari ini untuk mendapatkan tanggal kemarin
   yesterday.setDate(yesterday.getDate() - 1);
-
-  return (
-    date.getDate() === yesterday.getDate() &&
-    date.getMonth() === yesterday.getMonth() &&
-    date.getFullYear() === yesterday.getFullYear()
-  );
+  return (date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear());
 };
 
 /* ════════════════════════════════
@@ -222,6 +207,7 @@ const isYesterday = (dateString) => {
 ════════════════════════════════ */
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [insights, setInsights] = useState(null); // <-- State untuk AI Insights
   const [loading, setLoading] = useState(true);
   const [showYesterdayAct, setShowYesterdayAct] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -229,15 +215,14 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Diubah menjadi async untuk memanggil API secara paralel dan memfilter secara ketat
   const fetchDashboardData = async () => {
     const token = localStorage.getItem("token");
     if (!token) { window.location.href = "/login"; return; }
 
     try {
-      // Panggil Dashboard API dan Record API secara bersamaan
-      const [dashRes, recordsRes] = await Promise.all([
-        fetch("https://gateforlaravl.vercel.app/api/dashboard", {
+      // ─── AMBIL DATA PARALEL TERMASUK INSIGHTS ───
+      const [dashRes, recordsRes, insightsRes] = await Promise.all([
+        fetch("https://imphenteam-production.up.railway.app/api/dashboard", {
           headers: {
             Authorization: `Bearer ${token}`,
             'Accept': 'application/json',
@@ -245,27 +230,27 @@ export default function Dashboard() {
           },
         }).then(r => r.json()),
 
-        // Memanfaatkan apiGet untuk mengambil raw records riwayat
-        apiGet("/activities/record", token).catch(() => [])
+        apiGet("/activities/record", token).catch(() => []),
+
+        // API Insights Baru yang kita buat di backend Express
+        fetch("https://imphenteam-production.up.railway.app/api/insights", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Accept': 'application/json',
+            'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
+          },
+        }).then(r => r.json()).catch(() => null)
       ]);
 
-      // Ambil array record (mencegah error jika data kosong)
       const allRecords = Array.isArray(recordsRes) ? recordsRes : (recordsRes?.data || []);
-
-      // Filter ketat menggunakan helper yang sudah dibuat
       const todayActivities = allRecords.filter(a => isToday(a.created_at));
       const yesterdayActivities = allRecords.filter(a => isYesterday(a.created_at));
-
-      // Hitung manual berdasarkan data valid
       const todayBurned = todayActivities.reduce((sum, a) => sum + (a.calories_burned || a.burned || 0), 0);
       const yesterdayBurned = yesterdayActivities.reduce((sum, a) => sum + (a.calories_burned || a.burned || 0), 0);
 
       const normalized = {
         calories_today: dashRes?.today?.total_calories_in || dashRes?.today?.calories_in || 0,
-
-        // Prioritaskan perhitungan dari validitas hari ini, jika 0 pakai fallback dashboard
         calories_burned: todayBurned > 0 ? todayBurned : (dashRes?.today?.total_calories_out || dashRes?.today?.calories_out || 0),
-
         calorie_goal: dashRes?.target_calories || 2000,
         macros: {
           protein: dashRes?.today?.protein || 0,
@@ -274,14 +259,15 @@ export default function Dashboard() {
         },
         water: { current: dashRes?.today?.water ?? 0, goal: 8 },
         recent_meals: dashRes?.today?.meals || [],
-
-        // Gunakan aktivitas yang sudah di filter
         recent_activities: todayActivities.length > 0 ? todayActivities : (dashRes?.today?.activities || []),
         yesterday_activities: yesterdayActivities,
         yesterday_calories_burned: yesterdayBurned,
       };
 
       setData(normalized);
+      if (insightsRes && insightsRes.status === 'success') {
+        setInsights(insightsRes.data);
+      }
       setLoading(false);
 
     } catch (error) {
@@ -297,11 +283,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-blue-50 to-white gap-3.5" style={{ fontFamily: "'Sora', sans-serif" }}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
-          className="w-8 h-8 rounded-full border-4 border-blue-200 border-t-blue-600"
-        />
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }} className="w-8 h-8 rounded-full border-4 border-blue-200 border-t-blue-600" />
         <p className="text-blue-300 text-[13px] font-semibold">Memuat dashboard…</p>
       </div>
     );
@@ -311,26 +293,38 @@ export default function Dashboard() {
   const remaining = Math.max(data.calorie_goal - data.calories_today, 0);
   const netCalories = data.calories_today - data.calories_burned;
 
+  // --- RECHARTS DATA PREPARATION ---
+  const pieColors = ['#3498db', '#f39c12', '#2ecc71'];
+  const pieData = insights ? [
+    { name: 'Rendah', value: insights.distribution['Rendah'].count },
+    { name: 'Sedang', value: insights.distribution['Sedang'].count },
+    { name: 'Tinggi', value: insights.distribution['Tinggi'].count },
+  ].filter(d => d.value > 0) : [];
+
+  const barData = insights ? [
+    { name: 'Rendah', Protein: insights.distribution['Rendah'].avg_protein, Lemak: insights.distribution['Rendah'].avg_fat, Karbo: insights.distribution['Rendah'].avg_carbs },
+    { name: 'Sedang', Protein: insights.distribution['Sedang'].avg_protein, Lemak: insights.distribution['Sedang'].avg_fat, Karbo: insights.distribution['Sedang'].avg_carbs },
+    { name: 'Tinggi', Protein: insights.distribution['Tinggi'].avg_protein, Lemak: insights.distribution['Tinggi'].avg_fat, Karbo: insights.distribution['Tinggi'].avg_carbs },
+  ] : [];
+
   return (
     <>
       <link href={FONTS} rel="stylesheet" />
       <div className="flex flex-col md:flex-row min-h-screen bg-slate-50" style={{ fontFamily: "'Sora', -apple-system, sans-serif" }}>
 
-        {/* MAIN CONTENT AREA */}
         <main className="flex-1 pb-24 md:pb-8 md:pl-[90px] w-full">
 
           {/* ─── HEADER HERO ─── */}
           <motion.div {...fadeUp(0)} className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 pt-[clamp(32px,8vw,48px)] pb-9 px-6 rounded-b-[32px] md:rounded-b-[40px] relative overflow-hidden">
             <div className="absolute -top-10 -right-7 w-36 h-36 rounded-full bg-white/5" />
             <div className="absolute -bottom-5 -left-5 w-24 h-24 rounded-full bg-white/5" />
-
             <div className="max-w-[1100px] mx-auto">
               <div className="flex justify-between items-center mb-8 relative">
                 <div>
                   <div className="text-xs text-white/70 font-semibold tracking-wide uppercase">Selamat datang</div>
                   <h1 className="text-[clamp(22px,5vw,28px)] font-extrabold text-white mt-1 tracking-tight">Dashboard 👋</h1>
                 </div>
-                <motion.div whileTap={{ scale: 0.9 }} className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center cursor-pointer">
+                <motion.div whileTap={{ scale: 0.9 }} onClick={() => navigate("/profile")} className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center cursor-pointer">
                   <User size={20} color="white" strokeWidth={2} />
                 </motion.div>
               </div>
@@ -388,9 +382,8 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* ─── BENTO GRID CONTENT ─── */}
+          {/* ─── BENTO GRID CONTENT (PERSONAL DATA) ─── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 md:p-8 max-w-[1100px] mx-auto">
-
             {/* MACROS */}
             <Card delay={0.08} className="lg:col-span-1 lg:col-start-1">
               <SectionHeader title="Nutrisi Hari Ini" />
@@ -403,25 +396,18 @@ export default function Dashboard() {
 
             {/* WATER */}
             <Card delay={0.13} className="lg:col-span-1 lg:col-start-2">
-              <SectionHeader
-                title="Air Minum"
-                action={`${data.water.current}/${data.water.goal} gelas`}
-              />
+              <SectionHeader action={`${data.water.current}/${data.water.goal} gelas`} title="Air Minum" />
               <div className="text-xs text-slate-500 mb-3 -mt-2.5">Total: {data.water.current * 250}ml</div>
               <div className="flex gap-1.5">
                 {Array.from({ length: data.water.goal }).map((_, i) => (
-                  <motion.div
-                    key={i} initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 1 }}
-                    transition={{ delay: 0.25 + i * 0.05, duration: 0.3 }}
-                    className="flex-1"
-                  >
+                  <motion.div key={i} initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 1 }} transition={{ delay: 0.25 + i * 0.05, duration: 0.3 }} className="flex-1">
                     <WaterGlass filled={i < data.water.current} />
                   </motion.div>
                 ))}
               </div>
             </Card>
 
-            {/* QUICK ACTIONS - SINGLE CARD */}
+            {/* QUICK ACTIONS */}
             <div className="lg:col-span-1 lg:col-start-3 flex flex-col">
               <Card delay={0.18} className="flex-1 flex flex-col justify-center cursor-pointer hover:-translate-y-1 transition-transform !p-6" onClick={() => setShowFoodModal(true)}>
                 <div className="w-14 h-14 rounded-[16px] bg-sky-100 flex items-center justify-center mb-4">
@@ -432,43 +418,16 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* NET CALORIE SUMMARY */}
-            <Card delay={0.22} className="lg:col-span-3 !bg-gradient-to-br !from-sky-50 !to-blue-50 !p-6">
-              <div className="flex justify-between items-center">
-                <div className="text-center flex-1">
-                  <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Masuk</div>
-                  <div className="text-2xl font-extrabold text-blue-600 font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{data.calories_today.toLocaleString("id-ID")}</div>
-                  <div className="text-xs text-blue-300 mt-0.5">kcal</div>
-                </div>
-                <div className="w-[2px] h-12 bg-blue-200" />
-                <div className="text-center flex-1">
-                  <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Terbakar</div>
-                  <div className="text-2xl font-extrabold text-red-500 font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{data.calories_burned.toLocaleString("id-ID")}</div>
-                  <div className="text-xs text-red-300 mt-0.5">kcal</div>
-                </div>
-                <div className="w-[2px] h-12 bg-blue-200" />
-                <div className="text-center flex-1">
-                  <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Neto</div>
-                  <div className={`text-2xl font-extrabold font-mono ${netCalories > 0 ? "text-blue-600" : "text-emerald-500"}`} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    {netCalories.toLocaleString("id-ID")}
-                  </div>
-                  <div className="text-xs text-blue-300 mt-0.5">kcal</div>
-                </div>
-              </div>
-            </Card>
-
             {/* RECENT MEALS */}
             <Card delay={0.26} className="lg:col-span-2">
-              <SectionHeader title="Makan Hari Ini" action="Lihat semua" /> {/* onClick={() => navigate("/foods")}  */}
+              <SectionHeader title="Makan Hari Ini" />
               {data.recent_meals.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">🍽️</div>
                   <p className="text-sm text-slate-400 m-0">Belum ada makanan hari ini</p>
                 </div>
               ) : (
-                data.recent_meals.map((m, i) => (
-                  <MealRow key={i} name={m.name} time={m.time} calories={m.calories} index={i} />
-                ))
+                data.recent_meals.map((m, i) => <MealRow key={i} name={m.name} time={m.time} calories={m.calories} index={i} />)
               )}
             </Card>
 
@@ -481,102 +440,134 @@ export default function Dashboard() {
                   <p className="text-sm text-red-300 m-0">Belum ada aktivitas hari ini</p>
                 </div>
               ) : (
-                data.recent_activities.map((a, i) => (
-                  <ActivityRow key={i} name={a.name || a.activity?.name} duration={a.duration_minutes || a.duration} calories_burned={a.calories_burned || a.burned} index={i} />
-                ))
+                data.recent_activities.map((a, i) => <ActivityRow key={i} name={a.name || a.activity?.name} duration={a.duration_minutes || a.duration} calories_burned={a.calories_burned || a.burned} index={i} />)
               )}
             </Card>
+          </div>
 
-            {/* YESTERDAY'S ACTIVITIES */}
-            <motion.div {...fadeUp(0.34)} className="lg:col-span-3">
-              <div onClick={() => setShowYesterdayAct(v => !v)} className="bg-white border border-amber-100 rounded-[22px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(245,158,11,0.06)] cursor-pointer select-none">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
-                      <Activity size={20} className="text-amber-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="text-[15px] font-bold text-slate-900">Aktivitas Kemarin</div>
-                      {data.yesterday_activities.length > 0 && data.yesterday_calories_burned > 0 ? (
-                        <div className="text-xs text-amber-600 mt-0.5 font-semibold">
-                          {data.yesterday_activities.length} aktivitas · {data.yesterday_calories_burned} kcal terbakar
+          {/* ════════════════════════════════════════════════════════
+             SECTION BARU: INSIGHT DATA SCIENCE (AI)
+          ════════════════════════════════════════════════════════ */}
+          {insights && (
+            <motion.div {...fadeUp(0.4)} className="max-w-[1100px] mx-auto px-4 md:px-8 mt-6 mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-8 w-1.5 rounded-full bg-blue-600"></div>
+                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Database Insights (AI)</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+                
+                {/* KPI CARD */}
+                <Card delay={0.42} className="lg:col-span-3 !bg-slate-900 !text-white flex flex-wrap justify-between items-center py-5">
+                  <div className="flex-1 min-w-[120px] text-center border-r border-slate-700/50 last:border-0">
+                    <div className="text-slate-400 text-[11px] uppercase tracking-wider mb-1 font-semibold">Total Makanan</div>
+                    <div className="text-2xl font-bold font-mono">{insights.kpi.total_data}</div>
+                  </div>
+                  <div className="flex-1 min-w-[120px] text-center border-r border-slate-700/50 last:border-0">
+                    <div className="text-slate-400 text-[11px] uppercase tracking-wider mb-1 font-semibold">Rata-rata Kalori</div>
+                    <div className="text-2xl font-bold font-mono text-orange-400">{insights.kpi.avg_calories}</div>
+                  </div>
+                  <div className="flex-1 min-w-[120px] text-center border-r border-slate-700/50 last:border-0">
+                    <div className="text-slate-400 text-[11px] uppercase tracking-wider mb-1 font-semibold">Kalori Maksimum</div>
+                    <div className="text-2xl font-bold font-mono text-red-400">{insights.kpi.max_calories}</div>
+                  </div>
+                  <div className="flex-1 min-w-[120px] text-center last:border-0">
+                    <div className="text-slate-400 text-[11px] uppercase tracking-wider mb-1 font-semibold">Rata-rata Protein</div>
+                    <div className="text-2xl font-bold font-mono text-blue-400">{insights.kpi.avg_protein}g</div>
+                  </div>
+                </Card>
+
+                {/* PIE CHART: KATEGORI KALORI */}
+                <Card delay={0.45} className="lg:col-span-1">
+                  <SectionHeader title="Proporsi Kategori Kalori" />
+                  <div style={{ width: '100%', height: 220 }}>
+                    <ResponsiveContainer>
+                      <PieChart>
+                        <Pie data={pieData} innerRadius={55} outerRadius={80} paddingAngle={5} dataKey="value">
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="transparent" />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }} />
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: 600 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+
+                {/* BAR CHART: MAKRONUTRISI */}
+                <Card delay={0.48} className="lg:col-span-2">
+                  <SectionHeader title="Rata-rata Makronutrisi per Kategori" />
+                  <div style={{ width: '100%', height: 220 }}>
+                    <ResponsiveContainer>
+                      <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                        <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }} />
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                        <Bar dataKey="Protein" fill="#00b894" radius={[4, 4, 0, 0]} barSize={25} />
+                        <Bar dataKey="Lemak" fill="#e84393" radius={[4, 4, 0, 0]} barSize={25} />
+                        <Bar dataKey="Karbo" fill="#6c5ce7" radius={[4, 4, 0, 0]} barSize={25} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+
+                {/* TOP PROTEIN EFFICIENCY */}
+                <Card delay={0.5} className="lg:col-span-2">
+                  <SectionHeader title="Top 5 Protein Efficiency" />
+                  <p className="text-xs text-slate-500 mb-4 -mt-2">Rasio protein per 100 kalori (Sangat baik untuk diet)</p>
+                  <div className="flex flex-col gap-3">
+                    {insights.protein_efficiency.top.slice(0, 5).map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className="w-6 text-center text-xs font-bold text-slate-400">{idx + 1}</div>
+                        <div className="flex-1 text-[13px] font-semibold text-slate-700 truncate">{item.name}</div>
+                        <div className="w-[100px] bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min((item.efficiency / insights.protein_efficiency.top[0].efficiency) * 100, 100)}%` }}></div>
                         </div>
-                      ) : (
-                        <div className="text-xs text-slate-400 mt-0.5">Tidak ada data kemarin</div>
-                      )}
+                        <div className="text-xs font-mono font-bold text-emerald-600 w-10 text-right">{item.efficiency}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* KALORI EXTREMES */}
+                <Card delay={0.52} className="lg:col-span-1">
+                  <SectionHeader title="Makanan Ekstrem" />
+                  <div className="flex flex-col gap-4 mt-2">
+                    <div className="bg-red-50 rounded-xl p-3 border border-red-100">
+                      <div className="flex items-center gap-2 mb-2 text-red-600 text-xs font-bold uppercase tracking-wide">
+                        <TrendingUp size={14} /> Kalori Tertinggi
+                      </div>
+                      <div className="text-[13px] font-semibold text-slate-800">{insights.extremes.highest_calories[0]?.name}</div>
+                      <div className="text-xs text-slate-500 mt-0.5">{insights.extremes.highest_calories[0]?.calories} kcal / 100g</div>
+                    </div>
+                    
+                    <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                      <div className="flex items-center gap-2 mb-2 text-emerald-600 text-xs font-bold uppercase tracking-wide">
+                        <TrendingDown size={14} /> Kalori Terendah
+                      </div>
+                      <div className="text-[13px] font-semibold text-slate-800">{insights.extremes.lowest_calories[0]?.name}</div>
+                      <div className="text-xs text-slate-500 mt-0.5">{insights.extremes.lowest_calories[0]?.calories} kcal / 100g</div>
                     </div>
                   </div>
-                  <motion.div animate={{ rotate: showYesterdayAct ? 180 : 0 }} transition={{ duration: 0.25 }}>
-                    <ChevronDown size={20} className="text-amber-600" />
-                  </motion.div>
-                </div>
+                </Card>
 
-                <AnimatePresence>
-                  {showYesterdayAct && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden">
-                      <div className="mt-4 border-t border-amber-100 pt-4">
-                        {data.yesterday_activities.length === 0 ? (
-                          <div className="text-center py-5">
-                            <div className="text-3xl mb-2">😴</div>
-                            <p className="text-sm text-amber-600/60 m-0">Tidak ada aktivitas kemarin</p>
-                          </div>
-                        ) : (
-                          data.yesterday_activities.map((a, i) => (
-                            <ActivityRow key={i} name={a.name || a.activity?.name} duration={a.duration_minutes || a.duration} calories_burned={a.calories_burned || a.burned} index={i} dimmed />
-                          ))
-                        )}
-
-                        {data.yesterday_calories_burned > 0 && (
-                          <div className="mt-3 flex items-center justify-between bg-amber-100 rounded-2xl py-3 px-4">
-                            <span className="text-[13px] font-semibold text-amber-900">Total terbakar kemarin</span>
-                            <span className="text-base font-extrabold text-amber-600 font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                              {data.yesterday_calories_burned} kcal
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             </motion.div>
-
-          </div>
+          )}
         </main>
 
         {/* ─── MODAL POP-UP TAMBAH MAKANAN ─── */}
         <AnimatePresence>
           {showFoodModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                className="relative w-full max-w-md"
-              >
-                {/* Tombol Tutup Pop-Up */}
-                <button
-                  onClick={() => setShowFoodModal(false)}
-                  className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-colors cursor-pointer"
-                >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+              <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} className="relative w-full max-w-md">
+                <button onClick={() => setShowFoodModal(false)} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-colors cursor-pointer">
                   <X size={18} strokeWidth={2.5} />
                 </button>
-
-                {/* Panggil komponen FoodPredictor */}
-                <FoodPredictor
-                  onSuccess={() => {
-                    // Beri jeda 2 detik agar pengguna bisa melihat hasil prediksinya dulu
-                    setTimeout(() => {
-                      setShowFoodModal(false); // Tutup pop up
-                      fetchDashboardData(); // Refresh data Dashboard agar kalori langsung bertambah
-                    }, 2000);
-                  }}
-                />
+                <FoodPredictor onSuccess={() => { setTimeout(() => { setShowFoodModal(false); fetchDashboardData(); }, 2000); }} />
               </motion.div>
             </motion.div>
           )}
@@ -585,8 +576,8 @@ export default function Dashboard() {
         {/* ─── NAVBAR / SIDEBAR ─── */}
         <nav className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around p-2 pb-[max(16px,env(safe-area-inset-bottom))] z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:top-0 md:bottom-0 md:w-[90px] md:flex-col md:justify-start md:py-10 md:border-t-0 md:border-r md:border-slate-200 md:shadow-[4px_0_20px_rgba(0,0,0,0.02)] md:gap-4">
           <NavItem icon={<Home />} label="Home" to="/dashboard" active={location.pathname === "/dashboard"} />
-          <NavItem icon={<Activity />} label="Aktivitas" to="/activity" active={location.pathname === "/activity"} />
-          <NavItem icon={<CalendarDays />} label="Weekly Aktivitas" to="/weekly-activity" active={location.pathname === "/weekly-activity"} />
+          <NavItem icon={<ActivityIcon />} label="Aktivitas" to="/activity" active={location.pathname === "/activity"} />
+          <NavItem icon={<CalendarDays />} label="Weekly" to="/weekly-activity" active={location.pathname === "/weekly-activity"} />
           <NavItem icon={<User />} label="Profil" to="/profile" active={location.pathname === "/profile"} />
         </nav>
       </div>

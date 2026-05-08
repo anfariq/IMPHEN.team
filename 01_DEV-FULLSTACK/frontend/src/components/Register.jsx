@@ -67,7 +67,7 @@ export default function Register() {
     try {
       setLoading(true);
 
-      const res = await fetch("https://gateforlaravl.vercel.app/api/register", {
+      const res = await fetch("https://imphenteam-production.up.railway.app/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

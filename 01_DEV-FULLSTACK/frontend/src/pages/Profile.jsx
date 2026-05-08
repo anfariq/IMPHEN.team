@@ -71,7 +71,7 @@ export default function Profile() {
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        fetch("https://gateforlaravl.vercel.app/api/profile", {
+        fetch("https://imphenteam-production.up.railway.app/api/profile", {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Accept': 'application/json',
@@ -110,7 +110,7 @@ export default function Profile() {
 
         try {
             setIsDeleting(true);
-            const res = await fetch("https://gateforlaravl.vercel.app/api/user/delete", {
+            const res = await fetch("https://imphenteam-production.up.railway.app/api/user/delete", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export default function Profile() {
         setSaving(true);
 
         try {
-            const response = await fetch("https://gateforlaravl.vercel.app/api/profile", {
+            const response = await fetch("https://imphenteam-production.up.railway.app/api/profile", {
                 method: "POST", // Murni POST sesuai backend
                 headers: {
                     Authorization: `Bearer ${token}`,

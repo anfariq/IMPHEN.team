@@ -23,7 +23,7 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const res = await fetch("https://gateforlaravl.vercel.app/api/login", {
+      const res = await fetch("https://imphenteam-production.up.railway.app/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

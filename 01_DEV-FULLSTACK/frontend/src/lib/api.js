@@ -3,7 +3,7 @@ import axios from 'axios';
 // 1. Buat instance Axios
 const api = axios.create({
   // Ganti dengan link Gateway Node.js kamu yang di Railway nanti
-  baseURL: 'https://gateforlaravl.vercel.app/api', // Contoh: 'https://gateway-railway-production.up.railway.app/api'
+  baseURL: 'https://imphenteam-production.up.railway.app/api', // Contoh: 'https://gateway-railway-production.up.railway.app/api'
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

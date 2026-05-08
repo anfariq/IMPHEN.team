@@ -46,7 +46,7 @@ export default function WeeklyActivity() {
     useEffect(() => {
         const fetchActivity = async () => {
             try {
-                const response = await fetch("https://gateforlaravl.vercel.app/api/activity/weekly", {
+                const response = await fetch("https://imphenteam-production.up.railway.app/api/activity/weekly", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Accept': 'application/json',
