@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -72,17 +73,23 @@ class AuthController extends Controller
             </div>
         ";
 
-        // Kirim Email via Resend
         try {
-            Mail::html($htmlContent, function ($message) use ($user) {
-                $message->to($user->email)
-                        ->subject('Kode Verifikasi Akun Healthy AI')
-                        // 👇 Wajib tambahkan ini agar Resend tidak bingung siapa pengirimnya
-                        ->from(env('MAIL_FROM_ADDRESS', 'noreply@ownspace.my.id'), env('MAIL_FROM_NAME', 'Healthy App')); 
-            });
+            // KIRIM VIA HTTP API RESEND (Bypass SMTP Vercel)
+            $response = Http::withToken(env('MAIL_PASSWORD'))
+                ->post('https://api.resend.com/emails', [
+                    'from' => 'Healthy AI <' . env('MAIL_FROM_ADDRESS') . '>',
+                    'to' => [$user->email],
+                    'subject' => 'Kode Verifikasi Akun Healthy AI',
+                    'html' => $htmlContent
+                ]);
+
+            if (!$response->successful()) {
+                // Rollback user jika gagal kirim email
+                // DB::rollBack(); (Aktifkan jika pakai DB Transaction)
+                return response()->json(['message' => 'Gagal ngirim email: ' . $response->body()], 500);
+            }
         } catch (\Exception $e) {
-            // Jika email gagal dikirim (misal koneksi terputus), kembalikan pesan error
-            return response()->json(['message' => 'Berhasil daftar, tapi gagal mengirim email OTP. Silakan coba lagi.'], 500);
+            return response()->json(['message' => 'Koneksi gagal: ' . $e->getMessage()], 500);
         }
 
         return response()->json([
@@ -173,14 +180,22 @@ class AuthController extends Controller
         ";
 
         try {
-            Mail::html($htmlContent, function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Kode Verifikasi Akun Healthy AI')
-                    // 👇 Wajib tambahkan ini agar Resend tidak bingung siapa pengirimnya
-                    ->from(env('MAIL_FROM_ADDRESS', 'noreply@ownspace.my.id'), env('MAIL_FROM_NAME', 'Healthy App'));
-            });
+            // KIRIM VIA HTTP API RESEND (Bypass SMTP Vercel)
+            $response = Http::withToken(env('MAIL_PASSWORD'))
+                ->post('https://api.resend.com/emails', [
+                    'from' => 'Healthy AI <' . env('MAIL_FROM_ADDRESS') . '>',
+                    'to' => [$user->email],
+                    'subject' => 'Kirim Ulang: Kode Verifikasi Healthy AI',
+                    'html' => $htmlContent
+                ]);
+
+            if (!$response->successful()) {
+                // Sengaja kita tampilkan error asli dari Resend biar gampang debug
+                return response()->json(['message' => 'Gagal dari Resend: ' . $response->body()], 500);
+            }
+
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal mengirim ulang email OTP. Silakan coba beberapa saat lagi.'], 500);
+            return response()->json(['message' => 'Koneksi API gagal: ' . $e->getMessage()], 500);
         }
 
         return response()->json([
