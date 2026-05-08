@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'showProfile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::delete('/user/delete', [AuthController::class, 'deleteAccount']);
 
     // Makanan (CRUD & Search)
     // Tambahkan route search SEBELUM resource /foods agar tidak dianggap sebagai ID

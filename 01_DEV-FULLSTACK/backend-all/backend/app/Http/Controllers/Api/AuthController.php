@@ -324,4 +324,31 @@ class AuthController extends Controller
             'profile' => $profile
         ]);
     }
+
+    /**
+     * Endpoint: Menghapus akun pengguna secara permanen
+     */
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        // 1. Hapus Profile terkait
+        if ($user->profile) {
+            $user->profile()->delete();
+        }
+
+        // Opsional: Jika Nona Muda sudah men-set "ON DELETE CASCADE" di database, 
+        // langkah nomor 1 tidak perlu. Namun menghapus manual seperti ini lebih aman.
+        
+        // 2. Cabut semua token login (Sanctum)
+        $user->tokens()->delete();
+
+        // 3. Hapus Akun User
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Akun Anda beserta seluruh datanya telah berhasil dihapus permanen.'
+        ], 200);
+    }
 }
