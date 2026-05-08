@@ -17,8 +17,6 @@ export default function Login() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const showToast = (msg) => alert(msg);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -29,6 +27,7 @@ export default function Login() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
         },
         body: JSON.stringify({
@@ -40,6 +39,30 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
+        // TANGKAP ERROR JIKA BELUM VERIFIKASI (Status 403 & unverified)
+        if (res.status === 403 && data.status === 'unverified') {
+          toast.error(data.message, {
+            duration: 5000,
+            style: {
+              border: '1px solid #e2e8f0',
+              padding: '16px',
+              color: '#0f172a',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            iconTheme: {
+              primary: '#eab308', // Warna kuning/oranye untuk peringatan
+              secondary: '#fff',
+            },
+          });
+          
+          // Langsung arahkan ke halaman verifikasi dan bawa emailnya
+          navigate("/verify-otp", { state: { email: data.email || form.email } });
+          return; // Hentikan proses eksekusi di sini
+        }
+
+        // Lempar error biasa jika email/password salah
         throw new Error(data.message || "Login gagal");
       }
 
@@ -58,7 +81,7 @@ export default function Login() {
           fontWeight: '500',
         },
         iconTheme: {
-          primary: '#2563eb', // Warna biru yang senada dengan UI kamu
+          primary: '#2563eb', // Warna biru yang senada dengan UI
           secondary: '#fff',
         },
       });
@@ -92,7 +115,7 @@ export default function Login() {
         {/* BACK TO LANDING */}
         <a
           href="/"
-          className="absolute top-4 left-4 text-sm text-white font-medium hover:underline"
+          className="absolute top-4 left-4 text-sm text-white md:text-white font-medium hover:underline z-10 drop-shadow-md"
         >
           ← Back to Home
         </a>
@@ -145,7 +168,6 @@ export default function Login() {
 
             {/* Remember + Forgot */}
             <div className="flex items-center justify-end">
-
               <a
                 href="/forgot-password"
                 className="text-sm font-medium text-blue-600 hover:underline"
@@ -158,7 +180,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
             >
               {loading ? "Processing..." : "Login"}
             </button>

@@ -64,6 +64,11 @@ export default function Profile() {
     const navigate = useNavigate();
     const location = useLocation();
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [confirmUsername, setConfirmUsername] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         fetch("https://gateforlaravl.vercel.app/api/profile", {
@@ -95,6 +100,43 @@ export default function Profile() {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleDeleteAccount = async () => {
+        // Validasi apakah yang diketik sama persis dengan username (name)
+        if (confirmUsername !== user.name) {
+            return toast.error("Username yang Anda ketik tidak cocok!");
+        }
+
+        try {
+            setIsDeleting(true);
+            const res = await fetch("https://gateforlaravl.vercel.app/api/user/delete", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "x-api-key": "WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=="
+                }
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.message || "Gagal menghapus akun");
+
+            // Jika sukses, bersihkan localStorage dan lempar ke halaman depan
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            toast.success("Akun berhasil dihapus. Selamat tinggal!", { duration: 4000 });
+            navigate("/"); // Arahkan kembali ke Landing Page
+
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+        }
     };
 
     const handleSave = async (e) => {
@@ -372,6 +414,16 @@ export default function Profile() {
                                 <LogOut size={18} />
                                 Keluar dari Akun
                             </button>
+
+                            <button
+                                onClick={() => {
+                                    setConfirmUsername(""); // Kosongkan input saat modal dibuka
+                                    setShowDeleteModal(true);
+                                }}
+                                className="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3.5 rounded-xl transition-all border border-red-200"
+                            >
+                                Hapus Akun Permanen
+                            </button>
                         </motion.div>
 
                     </div>
@@ -384,6 +436,55 @@ export default function Profile() {
                     <NavItem icon={<CalendarDays />} label="Weekly Aktivitas" to="/weekly-activity" active={location.pathname === "/weekly-activity"} />
                     <NavItem icon={<User />} label="Profil" to="/profile" active={location.pathname === "/profile"} />
                 </nav>
+
+                {/* MODAL HAPUS AKUN */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+                        <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 md:p-8 animate-in fade-in zoom-in duration-200">
+
+                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-slate-800 text-center mb-2">Hapus Akun Permanen?</h3>
+                            <p className="text-sm text-slate-500 text-center mb-6">
+                                Apakah Anda yakin untuk menghapus akun Anda dari sistem kami? Semua data nutrisi dan aktivitas akan hilang selamanya dan tidak dapat dipulihkan.
+                            </p>
+
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
+                                <p className="text-xs text-slate-500 mb-1">Jika Anda yakin, ketikkan username Anda:</p>
+                                <p className="text-sm font-bold text-slate-800 mb-3 select-all">{user.name}</p>
+                                <input
+                                    type="text"
+                                    value={confirmUsername}
+                                    onChange={(e) => setConfirmUsername(e.target.value)}
+                                    placeholder="Ketik username di sini..."
+                                    className="w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                />
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    disabled={isDeleting}
+                                    className="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    disabled={isDeleting || confirmUsername !== user.name}
+                                    className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isDeleting ? "Menghapus..." : "Hapus Akun"}
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

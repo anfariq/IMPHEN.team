@@ -91,8 +91,8 @@ export default function Register() {
         throw new Error(data.message || "Register gagal");
       }
 
-      toast.success('Registrasi berhasil! Silakan login.', {
-        duration: 4000,
+      toast.success('Registrasi berhasil! Cek email Anda untuk kode verifikasi.', {
+        duration: 5000,
         style: {
           border: '1px solid #e2e8f0',
           padding: '16px',
@@ -102,11 +102,13 @@ export default function Register() {
           fontWeight: '500',
         },
         iconTheme: {
-          primary: '#22c55e', // Warna hijau untuk sukses
+          primary: '#22c55e', 
           secondary: '#fff',
         },
       });
-      navigate("/login");
+      
+      // JANGAN arahkan ke login. Arahkan ke verify-otp dan bawa emailnya
+      navigate("/verify-otp", { state: { email: data.email } });
     } catch (err) {
       toast.error(err.message, {
         duration: 4000,

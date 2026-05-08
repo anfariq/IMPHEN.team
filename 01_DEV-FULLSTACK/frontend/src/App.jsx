@@ -9,6 +9,7 @@ import Login from './components/Login'
 import Register from './components/Register'
 import ForgotPassword from './components/Forgotpw'
 import ResetPassword from './components/ResetPassword'
+import VerifyOtp from './components/VerifyOtp'
 
 // ProtectedRoute
 import Dashboard from './pages/Dashboard'
@@ -28,6 +29,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingP />} />
           {/* <Route path="/Welcome" element={<ButterflyWelcome /> */}
+          <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
