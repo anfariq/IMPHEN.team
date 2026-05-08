@@ -133,6 +133,60 @@ class AuthController extends Controller
     }
 
     /**
+     * Endpoint untuk mengirim ulang kode OTP
+     */
+    public function resendOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Pengguna tidak ditemukan.'], 404);
+        }
+
+        if ($user->status === 'verifikasi complete') {
+            return response()->json(['message' => 'Akun ini sudah diverifikasi. Anda bisa langsung login.'], 400);
+        }
+
+        // Generate OTP Baru
+        $newOtpCode = (string) rand(100000, 999999);
+        
+        $user->update([
+            'otp_code' => $newOtpCode
+        ]);
+
+        // Template HTML Email yang Cantik untuk Resend
+        $htmlContent = "
+            <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;'>
+                <h2 style='color: #0f172a; text-align: center;'>Kode OTP Baru Anda 🔄</h2>
+                <p style='color: #475569; font-size: 16px;'>Halo <b>{$user->name}</b>,</p>
+                <p style='color: #475569; font-size: 16px;'>Kami menerima permintaan untuk mengirimkan ulang kode verifikasi Anda. Berikut adalah kode OTP baru Anda:</p>
+                <div style='text-align: center; margin: 30px 0;'>
+                    <span style='font-size: 36px; font-weight: bold; color: #3b82f6; letter-spacing: 10px; background: #eff6ff; padding: 15px 30px; border-radius: 8px; display: inline-block;'>{$newOtpCode}</span>
+                </div>
+                <p style='color: #64748b; font-size: 14px;'>Kode ini akan menggantikan kode sebelumnya. Jangan berikan kode ini kepada siapa pun.</p>
+            </div>
+        ";
+
+        try {
+            Mail::html($htmlContent, function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject('Kirim Ulang: Kode Verifikasi Healthy AI');
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal mengirim ulang email OTP. Silakan coba beberapa saat lagi.'], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kode OTP baru berhasil dikirim ke email Anda.'
+        ], 200);
+    }
+
+    /**
      * Endpoint 3: Login User Biasa
      */
     public function login(Request $request)
