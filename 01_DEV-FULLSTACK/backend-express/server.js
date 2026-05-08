@@ -63,6 +63,7 @@ app.use(apiKeyMiddleware);
 // 5. DAFTARKAN ROUTES
 app.use('/api', apiRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
+// WAJIB tambahkan '0.0.0.0' agar bisa diakses proxy Railway
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server sukses mengudara di port ${PORT}`);
 });
