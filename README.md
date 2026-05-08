@@ -101,7 +101,7 @@ Menghasilkan produk yang:
 
 ---
 
-## 🤝 Kontribusi
+## 🤝 Salam Kontribusi
 
 Setiap anggota tim diharapkan:
 
