@@ -160,7 +160,19 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         $sessionId = Str::random(40);
 
-        // ... Logika session tracking yang sebelumnya sudah Nona Muda buat ...
+        $payload = base64_encode(json_encode([
+            'user_id' => $user->id,
+            'email' => $user->email,
+        ]));
+
+        \DB::table('sessions')->insert([
+            'id' => $sessionId,
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'payload' => $payload,
+            'last_activity' => now()->timestamp,
+        ]);
 
         return response()->json([
             'access_token' => $token,
@@ -179,7 +191,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Berhasil logout.']);
     }
 
-    // Endpoint 5: Tampilkan data profil user yang sedang login
     public function showProfile(Request $request)
     {
         $user = $request->user();
