@@ -82,5 +82,75 @@ const sendPasswordResetEmail = async (email, resetLink) => {
     return await resend.emails.send({ from: fromFormat, to: [email], subject: 'Reset Password', html: htmlContent });
 };
 
+async function sendEmailRecommendation(user, data) {
+    const { user_context, recommendations, last_consumed_food } = data;
+
+    // Generate list makanan dalam bentuk HTML
+    const foodListHtml = recommendations.map(food => `
+        <div style="border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
+            <img src="${food.image}" alt="${food.name}" style="width: 60px; height: 60px; border-radius: 5px; object-fit: cover; margin-right: 15px;">
+            <div>
+                <strong style="color: #2e7d32;">${food.name}</strong><br>
+                <small style="color: #666;">${food.calories} kkal | Protein: ${food.protein}g</small>
+            </div>
+        </div>
+    `).join('');
+
+    // --- LOGIKA STATUS KALORI BARU ---
+    let statusKalori = '';
+    // Kita kasih toleransi misal kurang/lebih 100 kkal dianggap "Sesuai" biar realistis
+    const selisih = user_context.net_calories - user_context.target_calories;
+    
+    if (selisih > 100) {
+        statusKalori = '<span style="color: #e53e3e;">Melebihi Target ⚠️</span>'; // Merah
+    } else if (selisih < -100) {
+        statusKalori = '<span style="color: #d97706;">Belum Memenuhi Target 📉</span>'; // Orange
+    } else {
+        statusKalori = '<span style="color: #10b981;">Sesuai Target ✅</span>'; // Hijau
+    }
+    // ---------------------------------
+
+    try {
+        const response = await resend.emails.send({
+            from: fromFormat, 
+            to: user.email,
+            subject: `Rekomendasi Menu Hari Ini untuk ${user.full_name} 🥗`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #4caf50;">Halo, ${user.full_name}!</h2>
+                    <p>Berdasarkan catatanmu kemarin, kamu mengonsumsi <strong>${last_consumed_food}</strong>.</p>
+                    
+                    <div style="background: #f1f8e9; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">Ringkasan Nutrisi Kemarin:</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>🔥 Kalori Masuk: <strong>${user_context.consumed_calories} kkal</strong></li>
+                            <li>🎯 Target Harian: <strong>${user_context.target_calories} kkal</strong></li>
+                            <li>📊 Status: <strong>${statusKalori}</strong></li>
+                        </ul>
+                    </div>
+
+                    <h3>Rekomendasi Makanan Sehat untukmu:</h3>
+                    <p style="color: #666;">Berikut adalah beberapa alternatif makanan yang mirip nutrisinya dengan ${last_consumed_food} namun tetap sehat:</p>
+                    
+                    ${foodListHtml}
+
+                    <p style="margin-top: 30px; font-size: 12px; color: #999;">
+                        Tetap semangat menjalani gaya hidup sehat bersama Healthy Lives & Well-being dari Devitra.id!
+                    </p>
+                </div>
+            `
+        });
+
+        if (response.error) {
+            console.error(`❌ [RESEND DITOLAK] Gagal mengirim ke ${user.email}. Alasan:`, response.error.message);
+        } else {
+            console.log(`✅ [SUKSES] Email terkirim ke ${user.email}. ID Resend:`, response.data.id);
+        }
+
+    } catch (err) {
+        console.error(`🚨 [SISTEM ERROR] Terjadi kesalahan saat mencoba mengirim email ke ${user.email}:`, err.message);
+    }
+}
+
 // Pastikan semua diekspor
-module.exports = { sendOtpEmail, sendResendOtpEmail, sendPasswordResetEmail };
+module.exports = { sendOtpEmail, sendResendOtpEmail, sendPasswordResetEmail, sendEmailRecommendation };

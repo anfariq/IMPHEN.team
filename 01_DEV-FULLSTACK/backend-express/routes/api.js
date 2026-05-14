@@ -58,6 +58,7 @@ router.get('/activity/weekly', activityController.getWeeklyActivity);
 // ML Service
 router.post('/ml/predict-calories', mlController.predictFood);
 router.post('/ml/predict-image', mlController.uploadImageMiddleware, mlController.predictFoodImage);
+router.post('/ml/daily-recommendation', mlController.getDailyRecommendation);
 
 // Dashboard
 router.get('/dashboard', summaryController.getDashboardData);
