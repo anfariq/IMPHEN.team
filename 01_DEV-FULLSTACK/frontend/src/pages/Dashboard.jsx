@@ -197,10 +197,10 @@ const parseDbDate = (dateString) => {
   if (!dateString) return null;
   let safeString = dateString;
   if (typeof dateString === 'string' && dateString.includes(' ') && !dateString.includes('T')) {
-    safeString = dateString.replace(' ', 'T') + 'Z'; 
+    safeString = dateString.replace(' ', 'T') + 'Z';
   }
   const d = new Date(safeString);
-  return isNaN(d) ? null : d; 
+  return isNaN(d) ? null : d;
 };
 
 const isToday = (dateString) => {
@@ -213,7 +213,7 @@ const isYesterday = (dateString) => {
   const inputDate = parseDbDate(dateString);
   if (!inputDate) return false;
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1); 
+  yesterday.setDate(yesterday.getDate() - 1);
   return wibFormatter.format(inputDate) === wibFormatter.format(yesterday);
 };
 
@@ -222,7 +222,7 @@ const isYesterday = (dateString) => {
 ════════════════════════════════ */
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [insights, setInsights] = useState(null); 
+  const [insights, setInsights] = useState(null);
   const [recommendation, setRecommendation] = useState(null); // <-- State Baru untuk ML
   const [loading, setLoading] = useState(true);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -235,9 +235,9 @@ export default function Dashboard() {
     if (!token) { window.location.href = "/login"; return; }
 
     const headersObj = {
-        Authorization: `Bearer ${token}`,
-        'Accept': 'application/json',
-        'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
+      Authorization: `Bearer ${token}`,
+      'Accept': 'application/json',
+      'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
     };
 
     try {
@@ -247,9 +247,9 @@ export default function Dashboard() {
         apiGet("/activities/record", token).catch(() => []),
         fetch("https://imphenteam-production.up.railway.app/api/insights", { headers: headersObj }).then(r => r.json()).catch(() => null),
         // Endpoint ML Baru
-        fetch("https://imphenteam-production.up.railway.app/api/ml/daily-recommendation", { 
-            method: "POST", 
-            headers: headersObj 
+        fetch("https://imphenteam-production.up.railway.app/api/ml/daily-recommendation", {
+          method: "POST",
+          headers: headersObj
         }).then(r => r.json()).catch(() => null)
       ]);
 
@@ -278,7 +278,7 @@ export default function Dashboard() {
       setData(normalized);
       if (insightsRes && insightsRes.status === 'success') setInsights(insightsRes.data);
       if (recRes && recRes.status === 'success') setRecommendation(recRes); // Simpan hasil ML
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Gagal memuat data Dashboard:", error);
@@ -393,30 +393,38 @@ export default function Dashboard() {
 
           {/* ─── BENTO GRID CONTENT ─── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 md:p-8 max-w-[1100px] mx-auto">
-            
+
             {/* ════════════════════════════════════════════════════
                 CARD REKOMENDASI AI (SPESIAL) - FULL WIDTH DI ATAS
             ════════════════════════════════════════════════════ */}
             {recommendation && recommendation.recommendations?.length > 0 && (
               <Card delay={0.05} className="lg:col-span-3 !bg-gradient-to-r !from-emerald-50 !to-teal-50 !border-emerald-100 !p-5 overflow-hidden relative">
                 <div className="absolute -right-6 -top-6 text-emerald-100/50">
-                   <Sparkles size={120} />
+                  <Sparkles size={120} />
                 </div>
-                
+
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles size={16} className="text-emerald-600" />
                     <span className="text-[15px] font-bold text-emerald-900">Rekomendasi Cerdas AI</span>
                   </div>
-                  
+
                   <p className="text-[13px] text-emerald-700/80 mb-4 pr-10">
                     Berdasarkan catatan makanan kemarin (<span className="font-semibold">{recommendation.last_consumed_food}</span>), kami menyarankan alternatif sehat ini untukmu hari ini:
                   </p>
-                  
+
                   <div className="flex gap-4 overflow-x-auto pb-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                     {recommendation.recommendations.map((food, idx) => (
                       <div key={idx} className="min-w-[130px] w-[130px] bg-white p-2.5 rounded-2xl shadow-[0_2px_10px_rgba(16,185,129,0.08)] shrink-0 flex flex-col transition-transform hover:-translate-y-1">
-                        <img src={food.image} alt={food.name} className="w-full h-20 object-cover rounded-xl mb-2.5" />
+                        <img
+                          src={food.image || "https://placehold.co/150x150/e2e8f0/64748b?text=Food"}
+                          alt={food.name}
+                          className="w-full h-20 object-cover rounded-xl mb-2.5"
+                          onError={(e) => {
+                            e.target.onerror = null; // Mencegah infinite loop jika gambar cadangan juga error
+                            e.target.src = "https://placehold.co/150x150/e2e8f0/64748b?text=Food";
+                          }}
+                        />
                         <div className="text-[12px] font-bold text-slate-800 line-clamp-2 leading-snug flex-1">{food.name}</div>
                         <div className="flex justify-between items-end mt-2">
                           <div className="text-[12px] font-mono font-bold text-emerald-600">{food.calories} <span className="text-[9px] font-sans text-slate-400 font-medium">kcal</span></div>
@@ -498,7 +506,7 @@ export default function Dashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-                
+
                 {/* KPI CARD */}
                 <Card delay={0.42} className="lg:col-span-3 !bg-slate-900 !text-white flex flex-wrap justify-between items-center py-5">
                   <div className="flex-1 min-w-[120px] text-center border-r border-slate-700/50 last:border-0">
@@ -585,7 +593,7 @@ export default function Dashboard() {
                       <div className="text-[13px] font-semibold text-slate-800">{insights.extremes.highest_calories[0]?.name}</div>
                       <div className="text-xs text-slate-500 mt-0.5">{insights.extremes.highest_calories[0]?.calories} kcal / 100g</div>
                     </div>
-                    
+
                     <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
                       <div className="flex items-center gap-2 mb-2 text-emerald-600 text-xs font-bold uppercase tracking-wide">
                         <TrendingDown size={14} /> Kalori Terendah
