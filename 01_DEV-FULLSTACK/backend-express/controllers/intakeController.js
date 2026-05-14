@@ -1,12 +1,18 @@
 const supabase = require('../config/supabase');
 
+const getWibDate = () => {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+};
+
 // Fungsi ini menghitung ulang total kalori dan air hari ini, lalu menyimpannya ke daily_summaries
 // --- HELPER: Pengganti DailySummaryService (Versi Lengkap dengan Makro Nutrisi) ---
 const updateDailySummary = async (userId) => {
     try {
-        const today = new Date().toISOString().split('T')[0];
-        const startOfToday = `${today}T00:00:00.000Z`;
-        const endOfToday = `${today}T23:59:59.999Z`;
+        const today = getWibDate();
+        
+        // PERBAIKAN: Set boundaries dengan offset +07:00 (WIB)
+        const startOfToday = `${today}T00:00:00.000+07:00`;
+        const endOfToday = `${today}T23:59:59.999+07:00`;
 
         // 1. Hitung Kalori Masuk & Makro Nutrisi (Join dengan tabel foods)
         const { data: foods } = await supabase
