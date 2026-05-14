@@ -3,8 +3,12 @@ const supabase = require('../config/supabase');
 exports.getDashboardData = async (req, res) => {
     try {
         const user = req.user;
-        const todayDate = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
-        const startOfToday = `${todayDate}T00:00:00.000Z`;
+        // 1. FIX: Ambil tanggal dengan zona waktu WIB (Asia/Jakarta)
+        const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); // Hasil: YYYY-MM-DD
+        
+        // 2. FIX: Gunakan offset +07:00 (WIB) agar Supabase memahaminya secara akurat
+        // Jangan pakai "Z" (Zulu/UTC) di belakangnya.
+        const startOfToday = `${todayDate}T00:00:00.000+07:00`;
 
         // 1. Ambil Summary Hari Ini
         const { data: todaySummary } = await supabase
