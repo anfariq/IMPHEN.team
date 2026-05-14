@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X, CalendarDays, TrendingUp, TrendingDown, Target, Activity as ActivityIcon } from "lucide-react";
+import { Home, Activity, User, Zap, ChevronRight, Flame, Apple, ChevronDown, X, CalendarDays, TrendingUp, TrendingDown, Target, Activity as ActivityIcon, Sparkles } from "lucide-react";
 import FoodPredictor from "./Foods";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiGet } from "../lib/api";
-// --- IMPORT RECHARTS UNTUK GRAFIK ---
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from "recharts";
 
 /* ── fonts ── */
@@ -187,7 +186,6 @@ function SectionHeader({ title, action, actionColor = "text-blue-600", onClick }
   );
 }
 
-// --- HELPER ZONA WAKTU WIB (Format: YYYY-MM-DD) ---
 const wibFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Jakarta',
   year: 'numeric',
@@ -195,34 +193,27 @@ const wibFormatter = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit'
 });
 
-// Helper untuk membersihkan string dari database MySQL/Postgres 
-// Jika DB mengirim "2026-05-14 22:00:00", kita paksa ubah jadi standar UTC
 const parseDbDate = (dateString) => {
   if (!dateString) return null;
   let safeString = dateString;
-  
   if (typeof dateString === 'string' && dateString.includes(' ') && !dateString.includes('T')) {
     safeString = dateString.replace(' ', 'T') + 'Z'; 
   }
-  
   const d = new Date(safeString);
-  return isNaN(d) ? null : d; // Return null jika string gagal diparsing
+  return isNaN(d) ? null : d; 
 };
 
 const isToday = (dateString) => {
   const inputDate = parseDbDate(dateString);
   if (!inputDate) return false;
-  
   return wibFormatter.format(inputDate) === wibFormatter.format(new Date());
 };
 
 const isYesterday = (dateString) => {
   const inputDate = parseDbDate(dateString);
   if (!inputDate) return false;
-  
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1); // Mundur 1 hari secara aman
-  
+  yesterday.setDate(yesterday.getDate() - 1); 
   return wibFormatter.format(inputDate) === wibFormatter.format(yesterday);
 };
 
@@ -231,9 +222,9 @@ const isYesterday = (dateString) => {
 ════════════════════════════════ */
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [insights, setInsights] = useState(null); // <-- State untuk AI Insights
+  const [insights, setInsights] = useState(null); 
+  const [recommendation, setRecommendation] = useState(null); // <-- State Baru untuk ML
   const [loading, setLoading] = useState(true);
-  const [showYesterdayAct, setShowYesterdayAct] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
 
   const navigate = useNavigate();
@@ -243,26 +234,22 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     if (!token) { window.location.href = "/login"; return; }
 
+    const headersObj = {
+        Authorization: `Bearer ${token}`,
+        'Accept': 'application/json',
+        'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
+    };
+
     try {
-      // ─── AMBIL DATA PARALEL TERMASUK INSIGHTS ───
-      const [dashRes, recordsRes, insightsRes] = await Promise.all([
-        fetch("https://imphenteam-production.up.railway.app/api/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Accept': 'application/json',
-            'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
-          },
-        }).then(r => r.json()),
-
+      // ─── AMBIL SEMUA DATA PARALEL ───
+      const [dashRes, recordsRes, insightsRes, recRes] = await Promise.all([
+        fetch("https://imphenteam-production.up.railway.app/api/dashboard", { headers: headersObj }).then(r => r.json()),
         apiGet("/activities/record", token).catch(() => []),
-
-        // API Insights Baru yang kita buat di backend Express
-        fetch("https://imphenteam-production.up.railway.app/api/insights", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Accept': 'application/json',
-            'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
-          },
+        fetch("https://imphenteam-production.up.railway.app/api/insights", { headers: headersObj }).then(r => r.json()).catch(() => null),
+        // Endpoint ML Baru
+        fetch("https://imphenteam-production.up.railway.app/api/ml/daily-recommendation", { 
+            method: "POST", 
+            headers: headersObj 
         }).then(r => r.json()).catch(() => null)
       ]);
 
@@ -289,11 +276,10 @@ export default function Dashboard() {
       };
 
       setData(normalized);
-      if (insightsRes && insightsRes.status === 'success') {
-        setInsights(insightsRes.data);
-      }
+      if (insightsRes && insightsRes.status === 'success') setInsights(insightsRes.data);
+      if (recRes && recRes.status === 'success') setRecommendation(recRes); // Simpan hasil ML
+      
       setLoading(false);
-
     } catch (error) {
       console.error("Gagal memuat data Dashboard:", error);
       setLoading(false);
@@ -315,9 +301,8 @@ export default function Dashboard() {
 
   const percent = Math.min((data.calories_today / data.calorie_goal) * 100, 100);
   const remaining = Math.max(data.calorie_goal - data.calories_today, 0);
-  const netCalories = data.calories_today - data.calories_burned;
 
-  // --- RECHARTS DATA PREPARATION ---
+  // Data Recharts
   const pieColors = ['#3498db', '#f39c12', '#2ecc71'];
   const pieData = insights ? [
     { name: 'Rendah', value: insights.distribution['Rendah'].count },
@@ -406,8 +391,43 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* ─── BENTO GRID CONTENT (PERSONAL DATA) ─── */}
+          {/* ─── BENTO GRID CONTENT ─── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 md:p-8 max-w-[1100px] mx-auto">
+            
+            {/* ════════════════════════════════════════════════════
+                CARD REKOMENDASI AI (SPESIAL) - FULL WIDTH DI ATAS
+            ════════════════════════════════════════════════════ */}
+            {recommendation && recommendation.recommendations?.length > 0 && (
+              <Card delay={0.05} className="lg:col-span-3 !bg-gradient-to-r !from-emerald-50 !to-teal-50 !border-emerald-100 !p-5 overflow-hidden relative">
+                <div className="absolute -right-6 -top-6 text-emerald-100/50">
+                   <Sparkles size={120} />
+                </div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles size={16} className="text-emerald-600" />
+                    <span className="text-[15px] font-bold text-emerald-900">Rekomendasi Cerdas AI</span>
+                  </div>
+                  
+                  <p className="text-[13px] text-emerald-700/80 mb-4 pr-10">
+                    Berdasarkan catatan makanan kemarin (<span className="font-semibold">{recommendation.last_consumed_food}</span>), kami menyarankan alternatif sehat ini untukmu hari ini:
+                  </p>
+                  
+                  <div className="flex gap-4 overflow-x-auto pb-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {recommendation.recommendations.map((food, idx) => (
+                      <div key={idx} className="min-w-[130px] w-[130px] bg-white p-2.5 rounded-2xl shadow-[0_2px_10px_rgba(16,185,129,0.08)] shrink-0 flex flex-col transition-transform hover:-translate-y-1">
+                        <img src={food.image} alt={food.name} className="w-full h-20 object-cover rounded-xl mb-2.5" />
+                        <div className="text-[12px] font-bold text-slate-800 line-clamp-2 leading-snug flex-1">{food.name}</div>
+                        <div className="flex justify-between items-end mt-2">
+                          <div className="text-[12px] font-mono font-bold text-emerald-600">{food.calories} <span className="text-[9px] font-sans text-slate-400 font-medium">kcal</span></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {/* MACROS */}
             <Card delay={0.08} className="lg:col-span-1 lg:col-start-1">
               <SectionHeader title="Nutrisi Hari Ini" />
@@ -469,9 +489,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* ════════════════════════════════════════════════════════
-             SECTION BARU: INSIGHT DATA SCIENCE (AI)
-          ════════════════════════════════════════════════════════ */}
+          {/* SECTION: INSIGHT DATA SCIENCE (AI) */}
           {insights && (
             <motion.div {...fadeUp(0.4)} className="max-w-[1100px] mx-auto px-4 md:px-8 mt-6 mb-12">
               <div className="flex items-center gap-3 mb-6">
@@ -501,7 +519,7 @@ export default function Dashboard() {
                   </div>
                 </Card>
 
-                {/* PIE CHART: KATEGORI KALORI */}
+                {/* PIE CHART */}
                 <Card delay={0.45} className="lg:col-span-1">
                   <SectionHeader title="Proporsi Kategori Kalori" />
                   <div style={{ width: '100%', height: 220 }}>
@@ -519,7 +537,7 @@ export default function Dashboard() {
                   </div>
                 </Card>
 
-                {/* BAR CHART: MAKRONUTRISI */}
+                {/* BAR CHART */}
                 <Card delay={0.48} className="lg:col-span-2">
                   <SectionHeader title="Rata-rata Makronutrisi per Kategori" />
                   <div style={{ width: '100%', height: 220 }}>
@@ -538,7 +556,7 @@ export default function Dashboard() {
                   </div>
                 </Card>
 
-                {/* TOP PROTEIN EFFICIENCY */}
+                {/* TOP PROTEIN */}
                 <Card delay={0.5} className="lg:col-span-2">
                   <SectionHeader title="Top 5 Protein Efficiency" />
                   <p className="text-xs text-slate-500 mb-4 -mt-2">Rasio protein per 100 kalori (Sangat baik untuk diet)</p>
@@ -583,7 +601,7 @@ export default function Dashboard() {
           )}
         </main>
 
-        {/* ─── MODAL POP-UP TAMBAH MAKANAN ─── */}
+        {/* ─── MODAL POP-UP ─── */}
         <AnimatePresence>
           {showFoodModal && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
@@ -597,7 +615,7 @@ export default function Dashboard() {
           )}
         </AnimatePresence>
 
-        {/* ─── NAVBAR / SIDEBAR ─── */}
+        {/* ─── NAVBAR ─── */}
         <nav className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around p-2 pb-[max(16px,env(safe-area-inset-bottom))] z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.02)] md:top-0 md:bottom-0 md:w-[90px] md:flex-col md:justify-start md:py-10 md:border-t-0 md:border-r md:border-slate-200 md:shadow-[4px_0_20px_rgba(0,0,0,0.02)] md:gap-4">
           <NavItem icon={<Home />} label="Home" to="/dashboard" active={location.pathname === "/dashboard"} />
           <NavItem icon={<ActivityIcon />} label="Aktivitas" to="/activity" active={location.pathname === "/activity"} />
