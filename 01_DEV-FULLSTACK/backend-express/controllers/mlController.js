@@ -138,57 +138,75 @@ exports.predictFoodImage = async (req, res) => {
     }
 };
 
+// --- HELPER ZONA WAKTU WIB (ANTI MELESET DI SERVER UTC) ---
+const getWIBMidnightISO = (offsetDays = 0) => {
+    // Ambil waktu saat ini di server, lalu konversi ke WIB
+    const wibTime = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    wibTime.setDate(wibTime.getDate() + offsetDays);
+    
+    const y = wibTime.getFullYear();
+    const m = String(wibTime.getMonth() + 1).padStart(2, '0');
+    const d = String(wibTime.getDate()).padStart(2, '0');
+    
+    // Buat format standar ISO dengan offset +07:00
+    // Hasil akhirnya akan otomatis diconvert ke UTC oleh NodeJS agar dibaca benar oleh Supabase
+    return new Date(`${y}-${m}-${d}T00:00:00+07:00`).toISOString();
+};
+
 // --------------------------------------------------------------------------
-// FUNGSI INTERNAL: Dipanggil oleh Cron Job (server.js) & Endpoint Express
+// FUNGSI INTERNAL: Dipanggil oleh Cron Job & Endpoint Express
+// Tambahan isCronJob agar Dashboard React tidak error karena mencari data "kemarin"
 // --------------------------------------------------------------------------
-const getRecommendationInternal = async (userId) => {
+const getRecommendationInternal = async (userId, isCronJob = false) => {
     try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1); 
-        
-        const startOfYesterdayISO = yesterday.toISOString();
-        const startOfTodayISO = today.toISOString();
+        const startOfYesterdayISO = getWIBMidnightISO(-1);
+        const startOfTodayISO = getWIBMidnightISO(0);
 
         // 1. Ambil Profil
         const { data: profile } = await supabase.from('profiles').select('target_calories').eq('user_id', userId).single();
         if (!profile) return null;
 
-        // 2. Ambil Daily Summary 
-        const { data: summary } = await supabase.from('daily_summaries').select('calories_in').eq('user_id', userId).gte('created_at', startOfYesterdayISO).lt('created_at', startOfTodayISO).order('created_at', { ascending: false }).limit(1).single();
-        if (!summary) return null;
+        // 2. Query Daily Summary
+        // Jika Dashboard, ambil summary terakhir. Jika CronJob, kunci ke hari kemarin.
+        let summaryQuery = supabase.from('daily_summaries').select('calories_in').eq('user_id', userId).order('created_at', { ascending: false }).limit(1);
+        if (isCronJob) summaryQuery = summaryQuery.gte('created_at', startOfYesterdayISO).lt('created_at', startOfTodayISO);
+        
+        const { data: summary } = await summaryQuery.single();
+        if (!summary) return null; // "Data belum lengkap" sering terjadi di sini
 
-        // 3. Ambil Aktivitas Terbakar
-        const { data: burns } = await supabase.from('user_activity_burns').select('calories_burned').eq('user_id', userId).gte('created_at', startOfYesterdayISO).lt('created_at', startOfTodayISO);
+        // 3. Query Aktivitas Terbakar
+        let burnQuery = supabase.from('user_activity_burns').select('calories_burned').eq('user_id', userId);
+        if (isCronJob) burnQuery = burnQuery.gte('created_at', startOfYesterdayISO).lt('created_at', startOfTodayISO);
+        else burnQuery = burnQuery.gte('created_at', startOfTodayISO); // Dashboard: Aktivitas hari ini
+
+        const { data: burns } = await burnQuery;
         const totalBurned = burns ? burns.reduce((acc, curr) => acc + curr.calories_burned, 0) : 0;
         const netCalories = summary.calories_in - totalBurned;
 
-        // ---------------------------------------------------------
-        // 4. AMBIL SEMUA MAKANAN KEMARIN (HAPUS .limit(1).single())
-        // ---------------------------------------------------------
-        const { data: intakes } = await supabase
-            .from('user_food_intakes')
-            .select(`food_id, foods(name)`)
-            .eq('user_id', userId)
-            .gte('created_at', startOfYesterdayISO)
-            .lt('created_at', startOfTodayISO);
-            
-        // Jika tidak ada data, batalkan
+        // 4. Query Makanan Terakhir
+        let intakeQuery = supabase.from('user_food_intakes').select(`food_id, foods(name)`).eq('user_id', userId).order('created_at', { ascending: false });
+        if (isCronJob) {
+            // CronJob (Email): Wajib ambil semua makanan KEMARIN
+            intakeQuery = intakeQuery.gte('created_at', startOfYesterdayISO).lt('created_at', startOfTodayISO);
+        } else {
+            // Dashboard React: Ambil 3 makanan TERBARU kapanpun itu dicatat
+            intakeQuery = intakeQuery.limit(3);
+        }
+
+        const { data: intakes } = await intakeQuery;
+        
+        // Jika tidak ada data, batalkan (Ini juga pemicu "Data belum lengkap")
         if (!intakes || intakes.length === 0) return null;
 
-        // Ekstrak nama makanan & buang duplikat (misal user masukin "Ayam" 2 kali)
+        // Ekstrak nama makanan & buang duplikat
         const uniqueFoods = [...new Set(intakes.filter(item => item.foods).map(item => item.foods.name))];
         const consumedFoodString = uniqueFoods.join(', '); // Hasil: "Ayam, Beras"
 
-        // ---------------------------------------------------------
-        // 5. TEMBAK API AI MULTIPLE KALI & GABUNGKAN HASILNYA
-        // ---------------------------------------------------------
+        // 5. Tembak API AI Multiple Kali & Gabungkan Hasilnya
         const RECOMMEND_URL = process.env.ML_SERVICE_URL_RECOMMENDATION;
         let allRecommendations = [];
 
-        // Batasi maksimal 3 makanan saja yang dicek ke AI agar server tidak ngelag
+        // Batasi maksimal 3 makanan saja yang dicek ke AI agar server tidak lambat
         for (const foodName of uniqueFoods.slice(0, 3)) {
             try {
                 const mlResponse = await fetch(RECOMMEND_URL, {
@@ -219,7 +237,6 @@ const getRecommendationInternal = async (userId) => {
         // Ambil 5 makanan gabungan terbaik
         const finalRecommendations = Array.from(uniqueRecsMap.values()).slice(0, 5);
 
-        // Jika AI tidak mengembalikan apa-apa, batalkan email
         if (finalRecommendations.length === 0) return null;
 
         const finalPayload = {
@@ -230,12 +247,9 @@ const getRecommendationInternal = async (userId) => {
                 net_calories: netCalories,
                 is_over_target: netCalories > profile.target_calories
             },
-            last_consumed_food: consumedFoodString, // "Ayam, Beras"
+            last_consumed_food: consumedFoodString,
             recommendations: finalRecommendations
         };
-
-        // Catat log
-        logPrediction(userId, '/recommend-internal', { foods: uniqueFoods }, finalPayload, 'success');
 
         return finalPayload;
 
@@ -247,11 +261,14 @@ const getRecommendationInternal = async (userId) => {
     }
 };
 
-// ENDPOINT EXPRESS: Untuk dipanggil oleh Frontend Next.js
+// --------------------------------------------------------------------------
+// ENDPOINT EXPRESS: Untuk dipanggil oleh Frontend React
+// --------------------------------------------------------------------------
 exports.getDailyRecommendation = async (req, res) => {
     try {
         const userId = req.user.id;
-        const data = await getRecommendationInternal(userId);
+        // Panggil fungsi dengan isCronJob = FALSE
+        const data = await getRecommendationInternal(userId, false);
 
         if (!data) {
             return res.status(404).json({ status: 'error', message: 'Data belum lengkap untuk analisis.' });
