@@ -187,19 +187,43 @@ function SectionHeader({ title, action, actionColor = "text-blue-600", onClick }
   );
 }
 
+// --- HELPER ZONA WAKTU WIB (Format: YYYY-MM-DD) ---
+const wibFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Jakarta',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+});
+
+// Helper untuk membersihkan string dari database MySQL/Postgres 
+// Jika DB mengirim "2026-05-14 22:00:00", kita paksa ubah jadi standar UTC
+const parseDbDate = (dateString) => {
+  if (!dateString) return null;
+  let safeString = dateString;
+  
+  if (typeof dateString === 'string' && dateString.includes(' ') && !dateString.includes('T')) {
+    safeString = dateString.replace(' ', 'T') + 'Z'; 
+  }
+  
+  const d = new Date(safeString);
+  return isNaN(d) ? null : d; // Return null jika string gagal diparsing
+};
+
 const isToday = (dateString) => {
-  if (!dateString) return false;
-  const date = new Date(dateString);
-  const today = new Date();
-  return (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear());
+  const inputDate = parseDbDate(dateString);
+  if (!inputDate) return false;
+  
+  return wibFormatter.format(inputDate) === wibFormatter.format(new Date());
 };
 
 const isYesterday = (dateString) => {
-  if (!dateString) return false;
-  const date = new Date(dateString);
+  const inputDate = parseDbDate(dateString);
+  if (!inputDate) return false;
+  
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return (date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear());
+  yesterday.setDate(yesterday.getDate() - 1); // Mundur 1 hari secara aman
+  
+  return wibFormatter.format(inputDate) === wibFormatter.format(yesterday);
 };
 
 /* ════════════════════════════════
