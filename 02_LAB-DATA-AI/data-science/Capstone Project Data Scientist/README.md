@@ -79,3 +79,7 @@ Project menggunakan:
 - Folder `gambar_makanan` harus tetap tersedia agar path gambar dapat digunakan dengan benar.
 
 ---
+
+## Live Dashboard
+Anda dapat mengakses dashboard interaktif proyek ini melalui tautan berikut:
+[Dashboard Analisis Nutrisi Makanan & Minuman Indonesia] (https://dashboard-nutrisi-makanan-minuman-indonesia.streamlit.app/)
