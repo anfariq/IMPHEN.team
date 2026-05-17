@@ -289,7 +289,7 @@ const FoodPredictor = ({ onSuccess }) => {
 
                 {/* ====================================
                     TAB 2: SCAN AI (DETEKSI GAMBAR)
-                ==================================== */}
+                ==================================== 
                 {activeTab === 'scan' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center gap-2 mb-1">
@@ -397,7 +397,7 @@ const FoodPredictor = ({ onSuccess }) => {
                         )}
                     </div>
                 )}
-
+                */}
                 {/* ====================================
                     TAB 3: AIR MINUM
                 ==================================== */}
