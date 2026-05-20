@@ -207,12 +207,13 @@ const FoodPredictor = ({ onSuccess }) => {
                     >
                         🍲 Cari
                     </button>
+                    {/*
                     <button
                         onClick={() => setActiveTab('scan')}
                         className={`flex-1 flex justify-center items-center gap-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'scan' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         <Sparkles size={14} /> Scan AI
-                    </button>
+                    </button> */}
                     <button
                         onClick={() => setActiveTab('water')}
                         className={`flex-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'water' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
