@@ -1,8 +1,8 @@
-**Deskripsi:**
+## Deskripsi:
 
 Dataset ini berisi informasi tentang kandungan gizi (makronutrien dan kalori) dari berbagai makanan dan minuman Indonesia. Data disajikan berdasarkan takaran saji per 100 gram.
 
-1. Kolom Original (setelah pembersihan data)
+## 1. Kolom Original (setelah pembersihan data)
 
 | Nama Kolom | Tipe Data | Deskripsi | Contoh Nilai |
 |:---------:|:---------:|:---------:|:---------:|
@@ -13,15 +13,20 @@ Dataset ini berisi informasi tentang kandungan gizi (makronutrien dan kalori) da
 | Karbohidrat | Float | Kandungan karbohidrat  dalam 100 gram makanan/minuman, diukur dalam gram (g). | 0.0, 10.8, 3.8, 87.4 |
 | URL Gambar | String | Tautan (URL) menuju gambar dari makanan/minuman tersebut. | "https://img-global.cpcdn.com/recipes/cbf330fbd1ba6316/1200x630cq70/photo.jpg" |
 
-2. Kolom Lanjutan
+## 2. Kolom Lanjutan
 
 | Nama Kolom | Tipe Data | Deskripsi | Contoh Nilai |
 |:---------:|:---------:|:---------:|:---------:|
 | Total Nutrisi | Float | Total keseluruhan kandungan makronutrien (Protein + Lemak + Karbohidrat) dalam 100 gram makanan yang digunakan untuk mengukur kepadatan nutrisi total secara umum. | 0.2, 12.3, 23.4, 98.1 |
+| Kategori Kalori | Category/String | Kategori tingkat kalori berdasarkan jumlah kalori per 100 gram makanan/minuman. | Rendah, Sedang, Tinggi |
+| Rasio Protein/Kalori | Float | Rasio kandungan protein terhadap jumlah kalori untuk mengukur efisiensi protein. | 0.01, 0.15, 0.32 |
+| Gambar | String | Path relatif menuju gambar makanan/minuman yang digunakan dalam analisis dan pengembangan model AI. | gambar_makanan/agar_agar.jpg |
 
-3. Variabel dalam Analisis
+## 3. Feature Engineering
 
-| Nama Variabel | Deskripsi | Rumus/Metode |
-|:---------:|:---------:|:---------:|
-| Total Nutrisi | Total keseluruhan kandungan makronutrien (Protein + Lemak + Karbohidrat) dalam 100 gram makanan yang digunakan untuk mengukur kepadatan nutrisi total secara umum. | Protein + Lemak + Karbohidrat |
-| Protein Efficiency | Rasio untuk mengevaluasi efisiensi protein. Nilai yang lebih tinggi menunjukkan makanan lebih efisien dalam menyediakan protein per kalori. | Protein/Kalori |
+Beberapa fitur tambahan dibuat untuk mendukung analisis dan pengembangan model, antara lain:
+
+- **Total Nutrisi**: hasil penjumlahan Protein + Lemak + Karbohidrat.
+- **Kategori Kalori**: pengelompokan tingkat kalori menjadi rendah, sedang, dan tinggi.
+- **Rasio Protein/Kalori**: rasio protein terhadap jumlah kalori untuk mengukur efisiensi protein.
+- **Gambar**: path relatif menuju gambar makanan/minuman yang digunakan dalam integrasi model AI berbasis citra.
