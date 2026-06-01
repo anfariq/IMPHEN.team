@@ -11,6 +11,7 @@ import WhyID from './Com-Landi/whid.jsx';
 import Features from './Com-Landi/feu.jsx';
 import Testimonials from './Com-Landi/testi.jsx';
 import Blog from './Com-Landi/blog.jsx';
+import Demo from './Com-Landi/Demo.jsx';
 
 export default function App() {
 
@@ -35,6 +36,9 @@ export default function App() {
 
       {/* HERO */}
       <Hero />
+
+      {/* DEMO VIDEO */}
+      <Demo />
 
       {/* HOW IT WORKS */}
       <HITW />
