@@ -75,7 +75,10 @@ export default function Hero() {
                         >
                             Start Tracking Now <ArrowRight size={18} />
                         </motion.a>
-                        <button className="text-sm font-medium text-slate-600 px-6 py-3.5 rounded-xl border border-slate-200 hover:border-blue-200 hover:text-blue-600 transition-colors">
+                        <button 
+                            onClick={() => document.getElementById('demo').scrollIntoView({ behavior: 'smooth' })}
+                            className="text-sm font-medium text-slate-600 px-6 py-3.5 rounded-xl border border-slate-200 hover:border-blue-200 hover:text-blue-600 transition-colors"
+                        >
                             Lihat Demo
                         </button>
                     </motion.div>
