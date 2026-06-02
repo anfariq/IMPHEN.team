@@ -7,13 +7,11 @@ export default function VerifyOtp() {
     const location = useLocation();
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
-    const [resending, setResending] = useState(false); // State untuk loading kirim ulang
+    const [resending, setResending] = useState(false);
 
-    // Mengambil email dari parameter navigasi (dari halaman register atau login)
     const email = location.state?.email;
 
     useEffect(() => {
-        // Tendang user kembali ke LOGIN jika mengakses halaman ini secara langsung / ter-refresh tanpa email
         if (!email) {
             toast.error("Sesi tidak valid. Silakan login kembali untuk melanjutkan verifikasi.", {
                 duration: 4000,
@@ -26,7 +24,7 @@ export default function VerifyOtp() {
                     fontWeight: '500',
                 },
                 iconTheme: {
-                    primary: '#eab308', // Warna kuning warning
+                    primary: '#eab308',
                     secondary: '#fff',
                 },
             });
@@ -93,13 +91,11 @@ export default function VerifyOtp() {
                 },
             });
 
-            // Simpan token login karena API verifyOtp sekarang merespons dengan token
             localStorage.setItem("token", data.access_token);
             if (data.user) {
                 localStorage.setItem("user", JSON.stringify(data.user));
             }
 
-            // Arahkan user ke dashboard atau halaman utama
             navigate("/dashboard");
 
         } catch (err) {
@@ -151,7 +147,7 @@ export default function VerifyOtp() {
                     fontWeight: '500',
                 },
                 iconTheme: {
-                    primary: '#3b82f6', // Warna biru info
+                    primary: '#3b82f6',
                     secondary: '#fff',
                 },
             });
@@ -211,7 +207,7 @@ export default function VerifyOtp() {
                             type="text"
                             maxLength="6"
                             value={otp}
-                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} // Hanya izinkan angka
+                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                             className="w-full px-4 py-4 text-center text-2xl font-bold tracking-[0.5em] border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
                             placeholder="••••••"
                             required

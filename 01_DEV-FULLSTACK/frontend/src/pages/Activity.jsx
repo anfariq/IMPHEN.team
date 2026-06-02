@@ -88,7 +88,6 @@ export default function Activity() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
-  // State untuk custom dropdown
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -152,11 +151,9 @@ export default function Activity() {
     }
   };
 
-  // Filter records berdasarkan hari ini
   const todaysRecords = (records || []).filter(r => isToday(r.created_at));
   const totalBurned = todaysRecords.reduce((sum, r) => sum + (r.calories_burned || 0), 0);
 
-  // Helper untuk mendapatkan nama aktivitas yang dipilih pada dropdown
   const getSelectedActivityName = () => {
     if (!form.activity_id) return "Pilih aktivitas...";
     for (const cat in activities) {

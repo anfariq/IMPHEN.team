@@ -223,7 +223,7 @@ const isYesterday = (dateString) => {
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [insights, setInsights] = useState(null);
-  const [recommendation, setRecommendation] = useState(null); // <-- State Baru untuk ML
+  const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFoodModal, setShowFoodModal] = useState(false);
 
@@ -241,12 +241,10 @@ export default function Dashboard() {
     };
 
     try {
-      // ─── AMBIL SEMUA DATA PARALEL ───
       const [dashRes, recordsRes, insightsRes, recRes] = await Promise.all([
         fetch("https://imphenteam-production.up.railway.app/api/dashboard", { headers: headersObj }).then(r => r.json()),
         apiGet("/activities/record", token).catch(() => []),
         fetch("https://imphenteam-production.up.railway.app/api/insights", { headers: headersObj }).then(r => r.json()).catch(() => null),
-        // Endpoint ML Baru
         fetch("https://imphenteam-production.up.railway.app/api/ml/daily-recommendation", {
           method: "POST",
           headers: headersObj
@@ -302,7 +300,6 @@ export default function Dashboard() {
   const percent = Math.min((data.calories_today / data.calorie_goal) * 100, 100);
   const remaining = Math.max(data.calorie_goal - data.calories_today, 0);
 
-  // Data Recharts
   const pieColors = ['#3498db', '#f39c12', '#2ecc71'];
   const pieData = insights ? [
     { name: 'Rendah', value: insights.distribution['Rendah'].count },
@@ -395,7 +392,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 md:p-8 max-w-[1100px] mx-auto">
 
             {/* ════════════════════════════════════════════════════
-                CARD REKOMENDASI AI (SPESIAL) - FULL WIDTH DI ATAS
+                CARD REKOMENDASI AI
             ════════════════════════════════════════════════════ */}
             {recommendation && recommendation.recommendations?.length > 0 && (
               <Card delay={0.05} className="lg:col-span-3 !bg-gradient-to-r !from-emerald-50 !to-teal-50 !border-emerald-100 !p-5 overflow-hidden relative">
@@ -421,7 +418,7 @@ export default function Dashboard() {
                           alt={food.name}
                           className="w-full h-20 object-cover rounded-xl mb-2.5"
                           onError={(e) => {
-                            e.target.onerror = null; // Mencegah infinite loop jika gambar cadangan juga error
+                            e.target.onerror = null;
                             e.target.src = "https://placehold.co/150x150/e2e8f0/64748b?text=Food";
                           }}
                         />

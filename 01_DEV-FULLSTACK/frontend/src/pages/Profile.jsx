@@ -103,7 +103,6 @@ export default function Profile() {
     };
 
     const handleDeleteAccount = async () => {
-        // Validasi apakah yang diketik sama persis dengan username (name)
         if (confirmUsername !== user.name) {
             return toast.error("Username yang Anda ketik tidak cocok!");
         }
@@ -124,12 +123,11 @@ export default function Profile() {
 
             if (!res.ok) throw new Error(data.message || "Gagal menghapus akun");
 
-            // Jika sukses, bersihkan localStorage dan lempar ke halaman depan
             localStorage.removeItem("token");
             localStorage.removeItem("user");
 
             toast.success("Akun berhasil dihapus. Selamat tinggal!", { duration: 4000 });
-            navigate("/"); // Arahkan kembali ke Landing Page
+            navigate("/");
 
         } catch (err) {
             toast.error(err.message);
@@ -145,14 +143,14 @@ export default function Profile() {
 
         try {
             const response = await fetch("https://imphenteam-production.up.railway.app/api/profile", {
-                method: "POST", // Murni POST sesuai backend
+                method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
                 },
-                body: JSON.stringify(form), // Murni form Nona Muda tanpa disisipi _method PUT
+                body: JSON.stringify(form),
             });
 
             if (response.ok) {
@@ -171,7 +169,6 @@ export default function Profile() {
                         secondary: '#fff',
                     },
                 });
-                // Refresh data profil setelah update
                 const updatedProfile = await response.json();
                 if (updatedProfile.profile) {
                     setForm({
@@ -417,7 +414,7 @@ export default function Profile() {
 
                             <button
                                 onClick={() => {
-                                    setConfirmUsername(""); // Kosongkan input saat modal dibuka
+                                    setConfirmUsername("");
                                     setShowDeleteModal(true);
                                 }}
                                 className="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3.5 rounded-xl transition-all border border-red-200"

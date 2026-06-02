@@ -1,4 +1,3 @@
-// components/BlogCard.js
 export const BlogCard = ({ blog, onClick }) => (
   <article
     onClick={() => onClick(blog)}

@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 
 export default function ForgotPassword() {
-  // 1. State untuk mengelola input, loading, dan pesan balasan
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
-  // 2. Fungsi untuk menembak API
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -15,12 +13,11 @@ export default function ForgotPassword() {
     setError(null);
 
     try {
-      // Ganti URL ini sesuai dengan URL backend Laravel Anda
       const response = await fetch("https://imphenteam-production.up.railway.app/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json", // Wajib agar Laravel merespon dengan JSON saat error
+          "Accept": "application/json",
           "x-api-key": "WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=="
         },
         body: JSON.stringify({ email }),
@@ -29,15 +26,12 @@ export default function ForgotPassword() {
       const data = await response.json();
 
       if (response.ok) {
-        // Jika sukses (Status 200)
         setMessage(data.message);
-        setEmail(""); // Kosongkan form
+        setEmail("");
       } else {
-        // Jika gagal (Status 4xx/5xx dari validasi Laravel)
         setError(data.message || "Terjadi kesalahan, silakan coba lagi.");
       }
     } catch (err) {
-      // Jika server mati atau ada masalah CORS
       setError("Gagal terhubung ke server. Pastikan backend sedang berjalan.");
     } finally {
       setIsLoading(false);

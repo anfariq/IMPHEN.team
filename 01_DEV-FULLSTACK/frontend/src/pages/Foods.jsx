@@ -4,12 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { UploadCloud, Image as ImageIcon, Loader2, CheckCircle2, AlertCircle, Sparkles, ChevronRight } from "lucide-react";
 
 const FoodPredictor = ({ onSuccess }) => {
-    // State untuk Tab Navigasi ('food' | 'scan' | 'water')
     const [activeTab, setActiveTab] = useState('food'); 
 
-    // ==========================================
-    // 1. STATE & LOGIC: CARI MAKANAN (MANUAL)
-    // ==========================================
     const [search, setSearch] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [selectedFood, setSelectedFood] = useState(null);
@@ -101,9 +97,6 @@ const FoodPredictor = ({ onSuccess }) => {
         }
     };
 
-    // ==========================================
-    // 2. STATE & LOGIC: SCAN GAMBAR AI (YOLOv8)
-    // ==========================================
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [scanLoading, setScanLoading] = useState(false);
@@ -160,16 +153,12 @@ const FoodPredictor = ({ onSuccess }) => {
         }
     };
 
-    // Fungsi pintar: Bawa hasil deteksi AI ke form pencarian database
     const handleUseDetection = (foodName) => {
         setActiveTab('food');
         setSearch(foodName);
-        setSelectedFood(null); // Reset pilihan lama agar user memilih dari database
+        setSelectedFood(null);
     };
 
-    // ==========================================
-    // 3. STATE & LOGIC: AIR MINUM
-    // ==========================================
     const [waterMl, setWaterMl] = useState('');
     const [waterLoading, setWaterLoading] = useState(false);
     const calculatedGlasses = waterMl ? Math.round(Number(waterMl) / 250) : 0;
@@ -207,13 +196,6 @@ const FoodPredictor = ({ onSuccess }) => {
                     >
                         🍲 Cari
                     </button>
-                    {/*
-                    <button
-                        onClick={() => setActiveTab('scan')}
-                        className={`flex-1 flex justify-center items-center gap-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'scan' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        <Sparkles size={14} /> Scan AI
-                    </button> */}
                     <button
                         onClick={() => setActiveTab('water')}
                         className={`flex-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all ${activeTab === 'water' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
@@ -226,7 +208,7 @@ const FoodPredictor = ({ onSuccess }) => {
             <div className="p-6 overflow-y-auto custom-scrollbar">
                 
                 {/* ====================================
-                    TAB 1: MAKANAN (CARI MANUAL)
+                    TAB 1: MAKANAN
                 ==================================== */}
                 {activeTab === 'food' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -289,118 +271,7 @@ const FoodPredictor = ({ onSuccess }) => {
                 )}
 
                 {/* ====================================
-                    TAB 2: SCAN AI (DETEKSI GAMBAR)
-                ==================================== 
-                {activeTab === 'scan' && (
-                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h2 className="text-xl font-black text-gray-800">AI Detector</h2>
-                            <span className="bg-blue-100 text-blue-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">YOLOv8</span>
-                        </div>
-                        <p className="text-sm text-gray-500 mb-5">Upload foto makananmu, biar AI yang tebak.</p>
-
-                        <AnimatePresence>
-                            {scanError && (
-                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mb-4 bg-red-50 text-red-600 p-3 rounded-xl flex gap-3 items-start text-sm border border-red-100">
-                                    <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                                    <p className="leading-snug">{scanError}</p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {!scanResult && (
-                            <div className="flex flex-col gap-4">
-                                <div 
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={handleDrop}
-                                    className={`relative border-2 border-dashed rounded-2xl overflow-hidden transition-all duration-200 ${
-                                        preview ? "border-blue-400 bg-blue-50/30" : "border-slate-300 bg-slate-50 hover:bg-slate-100"
-                                    }`}
-                                >
-                                    {preview ? (
-                                        <div className="relative group aspect-video w-full flex items-center justify-center bg-black/5">
-                                            <img src={preview} alt="Preview" className="max-w-full max-h-[250px] object-contain rounded-xl" />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                                <button onClick={() => fileInputRef.current?.click()} className="bg-white text-slate-900 px-4 py-2 rounded-xl text-sm font-bold shadow-lg hover:scale-105 transition-transform">
-                                                    Ganti Foto
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center justify-center py-10 px-6 text-center cursor-pointer aspect-video">
-                                            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 shadow-sm">
-                                                <UploadCloud size={30} />
-                                            </div>
-                                            <h4 className="font-bold text-slate-800 text-[15px] mb-1">Upload Foto Makanan</h4>
-                                            <p className="text-xs text-slate-500 max-w-[200px]">Tap atau drag foto ke area ini</p>
-                                        </div>
-                                    )}
-                                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
-                                </div>
-
-                                {preview && (
-                                    <button
-                                        onClick={analyzeImage}
-                                        disabled={scanLoading}
-                                        className={`w-full py-4 rounded-2xl text-[15px] font-bold flex items-center justify-center gap-2 transition-all shadow-md ${
-                                            scanLoading ? "bg-slate-100 text-slate-400 shadow-none" : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5"
-                                        }`}
-                                    >
-                                        {scanLoading ? <><Loader2 size={18} className="animate-spin" /> Menganalisis...</> : <><Sparkles size={18} /> Deteksi Sekarang</>}
-                                    </button>
-                                )}
-                            </div>
-                        )}
-
-                        {scanResult && (
-                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-4">
-                                <div className="flex gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <img src={preview} alt="Thumb" className="w-16 h-16 object-cover rounded-xl shadow-sm" />
-                                    <div className="flex flex-col justify-center">
-                                        <p className="text-[11px] text-slate-500 font-semibold tracking-wide uppercase mb-0.5">Hasil Analisis</p>
-                                        <p className="text-sm font-bold text-slate-800">Ditemukan {scanResult.length} item</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col gap-3">
-                                    {scanResult.length > 0 ? (
-                                        scanResult.map((food, idx) => {
-                                            const confidencePct = (food.confidence * 100).toFixed(1);
-                                            return (
-                                                <div key={idx} className="bg-white border border-blue-100 p-4 rounded-2xl shadow-sm relative overflow-hidden flex justify-between items-center">
-                                                    <div>
-                                                        <h4 className="font-extrabold text-slate-900 text-base capitalize">{food.name}</h4>
-                                                        <p className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 mt-0.5">
-                                                            <CheckCircle2 size={12} /> Akurasi: {confidencePct}%
-                                                        </p>
-                                                    </div>
-                                                    <button 
-                                                        onClick={() => handleUseDetection(food.name)}
-                                                        className="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1"
-                                                    >
-                                                        Gunakan <ChevronRight size={14} />
-                                                    </button>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className="text-center py-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <ImageIcon size={32} className="mx-auto text-slate-300 mb-2" />
-                                            <p className="text-sm font-medium text-slate-500">Tidak ada makanan terdeteksi.</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <button onClick={() => { setScanResult(null); setFile(null); setPreview(null); }} className="w-full mt-2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition-colors">
-                                    Foto Ulang
-                                </button>
-                            </motion.div>
-                        )}
-                    </div>
-                )}
-                */}
-                {/* ====================================
-                    TAB 3: AIR MINUM
+                    TAB 2: AIR MINUM
                 ==================================== */}
                 {activeTab === 'water' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">

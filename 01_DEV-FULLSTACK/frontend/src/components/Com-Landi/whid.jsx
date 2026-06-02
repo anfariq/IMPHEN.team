@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Database, Search, CheckCircle, Globe2, Zap } from 'lucide-react';
 
 export default function WHID() {
-    // Varian untuk container teks (kiri)
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -16,7 +15,6 @@ export default function WHID() {
         visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
     };
 
-    // Varian untuk list makanan (kanan)
     const listVariants = {
         hidden: { opacity: 0 },
         visible: {

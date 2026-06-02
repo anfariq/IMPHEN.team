@@ -1,4 +1,3 @@
-// Komponen Progress Lingkaran
 export function CircleProgress({ value, max, size = 120 }) {
   const pct = Math.min(value / max, 1);
   const r = 44;
@@ -16,7 +15,6 @@ export function CircleProgress({ value, max, size = 120 }) {
   );
 }
 
-// Komponen Modal Blog
 export function BlogModal({ blog, onClose }) {
   if (!blog) return null;
   return (

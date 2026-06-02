@@ -1,17 +1,14 @@
 import axios from 'axios';
 
-// 1. Buat instance Axios
 const api = axios.create({
-  // Ganti dengan link Gateway Node.js kamu yang di Railway nanti
-  baseURL: 'https://imphenteam-production.up.railway.app/api', // Contoh: 'https://gateway-railway-production.up.railway.app/api'
+  baseURL: 'https://imphenteam-production.up.railway.app/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ==' // Sesuai dengan di Node.js Gateway
+    'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
   }
 });
 
-// 2. Interceptor untuk otomatis nambahin Token Bearer (Biar nggak nulis manual terus)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -20,11 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/**
- * REUSABLE API FUNCTIONS
- */
-
-// Helper umum untuk GET
 export async function apiGet(path) {
   try {
     const response = await api.get(path);
@@ -34,7 +26,6 @@ export async function apiGet(path) {
   }
 }
 
-// Helper umum untuk POST
 export async function apiPost(path, body) {
   try {
     const response = await api.post(path, body);
@@ -44,18 +35,11 @@ export async function apiPost(path, body) {
   }
 }
 
-/**
- * SPECIFIC SERVICES
- */
 
 export async function getActivities() {
-    // Karena sudah pakai axios instance 'api', 
-    // endpoint otomatis nyambung ke baseURL + '/activities'
-    // Header API Key dan Bearer Token sudah otomatis terpasang
     return await apiGet('/activities');
 }
 
-// Tambahan contoh untuk Login (Biasanya nggak butuh Bearer token di awal)
 export async function loginUser(credentials) {
     return await apiPost('/login', credentials);
 }

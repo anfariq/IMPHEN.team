@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 export default function ResetPassword() {
-  // 1. State untuk form dan status
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [email, setEmail] = useState("");
@@ -11,9 +10,7 @@ export default function ResetPassword() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
-  // 2. Mengambil Parameter dari URL saat komponen dimuat
   useEffect(() => {
-    // Menangkap query string dari URL (contoh: ?token=abc&email=user@test.com)
     const searchParams = new URLSearchParams(window.location.search);
     const emailParam = searchParams.get("email");
     const tokenParam = searchParams.get("token");
@@ -26,11 +23,9 @@ export default function ResetPassword() {
     }
   }, []);
 
-  // 3. Fungsi untuk menembak API Reset Password
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validasi dasar di frontend
     if (password !== passwordConfirmation) {
       setError("Konfirmasi password tidak cocok!");
       return;
@@ -52,7 +47,7 @@ export default function ResetPassword() {
           email: email,
           token: token,
           password: password,
-          password_confirmation: passwordConfirmation, // Sesuai requirement validasi Laravel
+          password_confirmation: passwordConfirmation,
         }),
       });
 
@@ -62,10 +57,7 @@ export default function ResetPassword() {
         setMessage(data.message || "Password berhasil diubah! Silakan login.");
         setPassword("");
         setPasswordConfirmation("");
-        // Opsional: Redirect ke halaman login setelah 3 detik
-        // setTimeout(() => window.location.href = '/login', 3000);
       } else {
-        // Menangkap pesan error dari validasi Laravel (misal: password terlalu pendek)
         setError(data.message || "Gagal mereset password.");
       }
     } catch (err) {

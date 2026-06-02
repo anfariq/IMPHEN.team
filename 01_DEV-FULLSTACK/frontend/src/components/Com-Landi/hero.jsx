@@ -15,7 +15,6 @@ export default function Hero() {
     const consumed = 1100;
     const remaining = totalCal - consumed;
 
-    // Varian animasi untuk elemen yang muncul berurutan (Stagger)
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {

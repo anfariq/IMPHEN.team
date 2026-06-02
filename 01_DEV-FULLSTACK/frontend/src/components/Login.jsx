@@ -39,7 +39,6 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        // TANGKAP ERROR JIKA BELUM VERIFIKASI (Status 403 & unverified)
         if (res.status === 403 && data.status === 'unverified') {
           toast.error(data.message, {
             duration: 5000,
@@ -52,21 +51,18 @@ export default function Login() {
               fontWeight: '500',
             },
             iconTheme: {
-              primary: '#eab308', // Warna kuning/oranye untuk peringatan
+              primary: '#eab308',
               secondary: '#fff',
             },
           });
           
-          // Langsung arahkan ke halaman verifikasi dan bawa emailnya
           navigate("/verify-otp", { state: { email: data.email || form.email } });
-          return; // Hentikan proses eksekusi di sini
+          return; 
         }
 
-        // Lempar error biasa jika email/password salah
         throw new Error(data.message || "Login gagal");
       }
 
-      // simpan token
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -81,7 +77,7 @@ export default function Login() {
           fontWeight: '500',
         },
         iconTheme: {
-          primary: '#2563eb', // Warna biru yang senada dengan UI
+          primary: '#2563eb', 
           secondary: '#fff',
         },
       });
@@ -99,7 +95,7 @@ export default function Login() {
           fontWeight: '500',
         },
         iconTheme: {
-          primary: '#dc2626', // Warna merah untuk error
+          primary: '#dc2626',
           secondary: '#fff',
         },
       });

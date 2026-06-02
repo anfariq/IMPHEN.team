@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react'; // Pakai ikon Lucide biar lebih konsisten
+import { Star } from 'lucide-react';
 import { TESTIMONIALS } from './constants.jsx';
 
 export default function Testimonials() {
-    // Kita duplikasi data testimoninya agar loop tidak terlihat putus
     const duplicatedTestimonials = [...TESTIMONIALS, ...TESTIMONIALS];
 
     return (
@@ -22,13 +21,13 @@ export default function Testimonials() {
                 <motion.div 
                     className="flex gap-6 pr-6"
                     animate={{ 
-                        x: [0, -1920] // Sesuaikan angka ini dengan total lebar kartu kamu
+                        x: [0, -1920]
                     }}
                     transition={{ 
                         x: {
                             repeat: Infinity, 
                             repeatType: "loop", 
-                            duration: 40, // Makin besar angka, makin lambat jalannya
+                            duration: 40,
                             ease: "linear" 
                         }
                     }}

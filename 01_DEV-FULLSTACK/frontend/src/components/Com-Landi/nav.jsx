@@ -8,7 +8,6 @@ export default function Nav() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        // Cek apakah token ada di storage untuk menentukan status login
         const token = localStorage.getItem("token");
         if (token) {
             setIsLoggedIn(true);

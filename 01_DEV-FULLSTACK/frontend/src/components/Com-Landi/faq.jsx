@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react"; // Ikon modern
+import { ChevronDown } from "lucide-react"; 
 import { FAQS } from './constants.jsx';
 
 export default function Faq() {

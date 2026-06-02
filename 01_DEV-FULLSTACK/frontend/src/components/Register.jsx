@@ -27,7 +27,6 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // FE VALIDATION
     if (form.password !== form.confirmPassword) {
       return toast.error("Password dan konfirmasi password tidak cocok", {
         duration: 4000,
@@ -107,7 +106,6 @@ export default function Register() {
         },
       });
       
-      // JANGAN arahkan ke login. Arahkan ke verify-otp dan bawa emailnya
       navigate("/verify-otp", { state: { email: data.email } });
     } catch (err) {
       toast.error(err.message, {

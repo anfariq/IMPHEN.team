@@ -37,7 +37,7 @@ function NavItem({ icon, label, to, active }) {
 export default function WeeklyActivity() {
     const [loading, setLoading] = useState(true);
     const [weeklyData, setWeeklyData] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(0); // Index 0 = Hari Ini
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,12 +69,11 @@ export default function WeeklyActivity() {
         fetchActivity();
     }, [token]);
 
-    // Helper untuk memecah string tanggal (ex: "Senin, 01 Mei 2026")
     const parseDateInfo = (dateFormatted) => {
         if (!dateFormatted) return { dayName: "", dateNum: "" };
         const parts = dateFormatted.split(', ');
-        const dayName = parts[0] ? parts[0].substring(0, 3) : ""; // Ambil 3 huruf pertama
-        const dateNum = parts[1] ? parts[1].split(' ')[0] : ""; // Ambil angka tanggalnya saja
+        const dayName = parts[0] ? parts[0].substring(0, 3) : ""; 
+        const dateNum = parts[1] ? parts[1].split(' ')[0] : "";
         return { dayName, dateNum };
     };
 

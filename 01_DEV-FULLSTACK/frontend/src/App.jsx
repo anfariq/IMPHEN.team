@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import './App.css'
-// React Router
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom'
+
 // Pages
 import LandingP from './components/LandingP'
-import ButterflyWelcome from './components/ButterflyWelcome'
 import Login from './components/Login'
 import Register from './components/Register'
 import ForgotPassword from './components/Forgotpw'
@@ -28,7 +27,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingP />} />
-          {/* <Route path="/Welcome" element={<ButterflyWelcome /> */}
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
