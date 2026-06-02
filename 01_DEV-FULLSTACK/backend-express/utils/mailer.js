@@ -40,7 +40,7 @@ const sendResendOtpEmail = async (email, name, otpCode) => {
     return await resend.emails.send({ from: fromFormat, to: [email], subject: 'Kirim Ulang: Kode Verifikasi Healthy AI', html: htmlContent });
 };
 
-// 3. Email Reset Password
+
 const sendPasswordResetEmail = async (email, resetLink) => {
     const currentYear = new Date().getFullYear();
     const htmlContent = `
@@ -85,7 +85,6 @@ const sendPasswordResetEmail = async (email, resetLink) => {
 async function sendEmailRecommendation(user, data) {
     const { user_context, recommendations, last_consumed_food } = data;
 
-    // Generate list makanan dalam bentuk HTML
     const foodListHtml = recommendations.map(food => `
         <div style="border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center;">
             <img src="${food.image}" alt="${food.name}" style="width: 60px; height: 60px; border-radius: 5px; object-fit: cover; margin-right: 15px;">
@@ -96,19 +95,16 @@ async function sendEmailRecommendation(user, data) {
         </div>
     `).join('');
 
-    // --- LOGIKA STATUS KALORI BARU ---
     let statusKalori = '';
-    // Kita kasih toleransi misal kurang/lebih 100 kkal dianggap "Sesuai" biar realistis
     const selisih = user_context.net_calories - user_context.target_calories;
     
     if (selisih > 100) {
-        statusKalori = '<span style="color: #e53e3e;">Melebihi Target ⚠️</span>'; // Merah
+        statusKalori = '<span style="color: #e53e3e;">Melebihi Target ⚠️</span>'; 
     } else if (selisih < -100) {
-        statusKalori = '<span style="color: #d97706;">Belum Memenuhi Target 📉</span>'; // Orange
+        statusKalori = '<span style="color: #d97706;">Belum Memenuhi Target 📉</span>'; 
     } else {
-        statusKalori = '<span style="color: #10b981;">Sesuai Target ✅</span>'; // Hijau
+        statusKalori = '<span style="color: #10b981;">Sesuai Target ✅</span>'; 
     }
-    // ---------------------------------
 
     try {
         const response = await resend.emails.send({
@@ -152,5 +148,4 @@ async function sendEmailRecommendation(user, data) {
     }
 }
 
-// Pastikan semua diekspor
 module.exports = { sendOtpEmail, sendResendOtpEmail, sendPasswordResetEmail, sendEmailRecommendation };

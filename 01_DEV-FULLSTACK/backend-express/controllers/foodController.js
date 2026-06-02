@@ -1,15 +1,12 @@
 const supabase = require('../config/supabase');
 
-// 1. Mengambil semua data makanan dengan pagination
 exports.index = async (req, res) => {
     try {
-        // Ambil halaman dari query URL (?page=1), default ke 1
         const page = parseInt(req.query.page) || 1;
         const limit = 20;
         const start = (page - 1) * limit;
         const end = start + limit - 1;
 
-        // Query ke Supabase dengan paginasi
         const { data: foods, error, count } = await supabase
             .from('foods')
             .select('*', { count: 'exact' })
@@ -28,15 +25,13 @@ exports.index = async (req, res) => {
     }
 };
 
-// 2. Fungsi khusus untuk Live Search di React
 exports.search = async (req, res) => {
     try {
         const query = req.query.q;
         if (!query) {
-            return res.status(200).json([]); // Jika kosong, kembalikan array kosong
+            return res.status(200).json([]); 
         }
 
-        // Cari berdasarkan nama (ilike = case-insensitive LIKE)
         const { data: foods, error } = await supabase
             .from('foods')
             .select('*')
@@ -51,12 +46,10 @@ exports.search = async (req, res) => {
     }
 };
 
-// 3. Menampilkan detail makanan & meminta prediksi dari FastAPI (Tim AI)
 exports.show = async (req, res) => {
     try {
         const foodId = req.params.id;
 
-        // Ambil data makanan
         const { data: food, error } = await supabase
             .from('foods')
             .select('*')
@@ -78,7 +71,6 @@ exports.show = async (req, res) => {
         let aiPrediction = null;
         let aiStatus = 'failed';
 
-        // Tembak ke API Machine Learning (Ganti URL-nya pakai URL FastAPI nanti)
         try {
             const mlUrl = process.env.FASTAPI_ML_URL || process.env.ML_SERVICE_URL;
             
@@ -95,7 +87,6 @@ exports.show = async (req, res) => {
             }
         } catch (mlError) {
             console.error('Gagal menghubungi service ML:', mlError);
-            // Tetap lanjut, jangan crash backendnya kalau ML lagi mati
             aiStatus = 'ml_service_offline'; 
         }
 
@@ -110,18 +101,15 @@ exports.show = async (req, res) => {
     }
 };
 
-// 4. Menyimpan catatan makanan (UserFoodIntake)
 exports.store = async (req, res) => {
     try {
         const { food_id, qty_grams, total_calories } = req.body;
-        const user = req.user; // Didapat dari middleware auth kita sebelumnya
+        const user = req.user; 
 
-        // Validasi simpel
         if (!food_id || !qty_grams || !total_calories) {
             return res.status(400).json({ message: 'Semua field (food_id, qty_grams, total_calories) wajib diisi' });
         }
 
-        // Insert ke tabel user_food_intakes
         const { data: intake, error } = await supabase
             .from('user_food_intakes')
             .insert([{
@@ -129,7 +117,7 @@ exports.store = async (req, res) => {
                 food_id: food_id,
                 qty_grams: qty_grams,
                 total_calories: total_calories,
-                consumed_at: new Date().toISOString() // Format waktu standard (UTC)
+                consumed_at: new Date().toISOString() 
             }])
             .select()
             .single();

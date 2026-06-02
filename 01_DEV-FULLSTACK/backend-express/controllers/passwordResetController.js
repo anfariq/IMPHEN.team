@@ -5,24 +5,19 @@ const { sendPasswordResetEmail } = require('../utils/mailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_untuk_development_harus_diganti';
 
-// 1. Kirim Email Link Reset (Lupa Password)
 exports.sendResetLinkEmail = async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) return res.status(400).json({ message: 'Email wajib diisi.' });
 
-        // Cek apakah user ada
         const { data: user, error } = await supabase.from('users').select('id, email').eq('email', email).single();
         if (error || !user) return res.status(400).json({ message: 'Email tidak ditemukan di sistem kami.' });
 
-        // Generate Token JWT khusus reset password (berlaku 60 menit)
         const token = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '1h' });
 
-        // Ambil FRONTEND_URL dari .env (Fallback ke Vercel URL yang ada di kodemu sebelumnya)
         const frontendUrl = process.env.FRONTEND_URL || 'https://frontend-kohl-beta-61.vercel.app';
         const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${user.email}`;
 
-        // Kirim via Resend
         await sendPasswordResetEmail(user.email, resetLink);
 
         return res.status(200).json({ message: 'Link reset password telah dikirim ke email Anda.' });
@@ -31,7 +26,6 @@ exports.sendResetLinkEmail = async (req, res) => {
     }
 };
 
-// 2. Proses Reset Password Baru
 exports.reset = async (req, res) => {
     try {
         const { token, email, password, password_confirmation } = req.body;
@@ -46,7 +40,6 @@ exports.reset = async (req, res) => {
             return res.status(400).json({ message: 'Password minimal 8 karakter.' });
         }
 
-        // Verifikasi apakah token valid dan belum kedaluwarsa
         let decoded;
         try {
             decoded = jwt.verify(token, JWT_SECRET);
@@ -54,15 +47,12 @@ exports.reset = async (req, res) => {
             return res.status(400).json({ message: 'Token tidak valid atau sudah kedaluwarsa (lebih dari 60 menit).' });
         }
 
-        // Pastikan email di dalam token sama dengan email yang mau direset
         if (decoded.email !== email) {
             return res.status(400).json({ message: 'Token ini bukan untuk email Anda.' });
         }
 
-        // Hash password baru
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Update password di database
         const { error } = await supabase.from('users').update({ password: hashedPassword }).eq('email', email);
         if (error) throw error;
 

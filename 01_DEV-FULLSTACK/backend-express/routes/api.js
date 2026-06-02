@@ -1,24 +1,21 @@
 const express = require('express');
 const router = express.Router();
 
-const { protect } = require('../middlewares/authMiddleware'); // Import Middleware
+const { protect } = require('../middlewares/authMiddleware');
 
 const authController = require('../controllers/authController');
-const foodController = require('../controllers/foodController'); // <-- 1. Import Food Controller
+const foodController = require('../controllers/foodController'); 
 const activityController = require('../controllers/activityController');
 const summaryController = require('../controllers/summaryController');
 const passwordResetController = require('../controllers/passwordResetController');
 const intakeController = require('../controllers/intakeController');
 const mlController = require('../controllers/mlController');
 
-// Health Check
 router.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-/* =========================================
-   PUBLIC ROUTES (Tidak butuh token)
-   ========================================= */
+
 router.post('/login', authController.login);
 router.post('/register', authController.register);
 router.post('/verify-otp', authController.verifyOtp);
@@ -30,19 +27,18 @@ router.get('/foods/search', foodController.search);
 router.get('/foods', foodController.index);
 
 /* =========================================
-   PROTECTED ROUTES (Wajib Token / Sanctum Equivalent)
+   PROTECTED ROUTES
    ========================================= */
-// Semua route di bawah ini otomatis akan melewati middleware 'protect'
 router.use(protect); 
 
 router.get('/profile', authController.showProfile);
 router.post('/profile', authController.updateProfile);
 router.delete('/user/delete', authController.deleteAccount);
 
-// Makanan: Rute yang dilindungi
-router.get('/foods/:id', foodController.show); // Menampilkan detail & panggil AI
+// Makanan
+router.get('/foods/:id', foodController.show);
 router.post('/foods', foodController.store);
-// Catatan Makanan (Dua route mengarah ke fungsi yang sama seperti di Laravel)
+// Catatan Makanan
 router.post('/food-intake', intakeController.storeFood);
 router.post('/intakes', intakeController.storeFood);
 
@@ -64,8 +60,7 @@ router.post('/ml/daily-recommendation', mlController.getDailyRecommendation);
 router.get('/dashboard', summaryController.getDashboardData);
 router.get('/insights', summaryController.getDsInsights);
 
-// Untuk logout di Express dengan JWT (karena stateless), biasanya cukup dihapus dari sisi Frontend (hapus token dari local storage/cookies). 
-// Namun jika mau dikasih respon sukses:
+// Untuk logout
 router.post('/logout', (req, res) => {
     res.status(200).json({ message: 'Berhasil logout.' });
 });

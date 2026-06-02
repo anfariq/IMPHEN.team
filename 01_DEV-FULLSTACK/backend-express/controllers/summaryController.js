@@ -3,14 +3,10 @@ const supabase = require('../config/supabase');
 exports.getDashboardData = async (req, res) => {
     try {
         const user = req.user;
-        // 1. FIX: Ambil tanggal dengan zona waktu WIB (Asia/Jakarta)
-        const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); // Hasil: YYYY-MM-DD
+        const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
         
-        // 2. FIX: Gunakan offset +07:00 (WIB) agar Supabase memahaminya secara akurat
-        // Jangan pakai "Z" (Zulu/UTC) di belakangnya.
         const startOfToday = `${todayDate}T00:00:00.000+07:00`;
 
-        // 1. Ambil Summary Hari Ini
         const { data: todaySummary } = await supabase
             .from('daily_summaries')
             .select('*')
@@ -18,7 +14,6 @@ exports.getDashboardData = async (req, res) => {
             .eq('date', todayDate)
             .single();
 
-        // 2. Ambil 5 Makanan Terakhir (Mirip dengan_with('food')_ Eloquent)
         const { data: recentMeals } = await supabase
             .from('user_food_intakes')
             .select('*, food:foods(name)')
@@ -27,7 +22,6 @@ exports.getDashboardData = async (req, res) => {
             .order('consumed_at', { ascending: false })
             .limit(5);
 
-        // Map data makanan agar formatnya sesuai dengan kebutuhan Frontend kamu
         const formattedMeals = (recentMeals || []).map(intake => {
             const dateObj = new Date(intake.consumed_at);
             const time = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
@@ -38,7 +32,6 @@ exports.getDashboardData = async (req, res) => {
             };
         });
 
-        // 3. Ambil 5 Olahraga Terakhir
         const { data: recentActivities } = await supabase
             .from('user_activity_burns')
             .select('*, activity:activities(name)')
@@ -47,7 +40,6 @@ exports.getDashboardData = async (req, res) => {
             .order('created_at', { ascending: false })
             .limit(5);
 
-        // Kirim response akhir
         return res.status(200).json({
             target_calories: user.profiles?.[0]?.target_calories || 2000,
             today: {
@@ -67,11 +59,9 @@ exports.getDashboardData = async (req, res) => {
     }
 };
 
-// Tambahkan di bagian bawah controllers/summaryController.js
 
 exports.getDsInsights = async (req, res) => {
     try {
-        // 1. Ambil semua data makanan dari Supabase
         const { data: foods, error } = await supabase.from('foods').select('*');
         if (error) throw error;
 
@@ -79,7 +69,6 @@ exports.getDsInsights = async (req, res) => {
             return res.status(200).json({ message: 'Data makanan masih kosong.' });
         }
 
-        // 2. Preprocessing (Sama seperti df['Kategori Kalori'] & df['Protein Efficiency'])
         let processedFoods = foods.map(f => {
             const total_nutrisi = (f.protein || 0) + (f.fat || 0) + (f.carbs || 0);
             const protein_efficiency = f.calories > 0 ? (f.protein / f.calories) : 0;
@@ -91,7 +80,6 @@ exports.getDsInsights = async (req, res) => {
             return { ...f, total_nutrisi, protein_efficiency, kategori_kalori };
         });
 
-        // 3. Distribusi Kategori Kalori (Untuk Pie Chart & Bar Chart)
         const distribution = {
             'Rendah': { count: 0, protein: 0, fat: 0, carbs: 0 },
             'Sedang': { count: 0, protein: 0, fat: 0, carbs: 0 },
@@ -106,21 +94,18 @@ exports.getDsInsights = async (req, res) => {
             distribution[cat].carbs += f.carbs;
         });
 
-        // Hitung rata-rata makronutrien per kategori
         Object.keys(distribution).forEach(cat => {
-            const count = distribution[cat].count || 1; // Hindari pembagian nol
+            const count = distribution[cat].count || 1;
             distribution[cat].avg_protein = Number((distribution[cat].protein / count).toFixed(1));
             distribution[cat].avg_fat = Number((distribution[cat].fat / count).toFixed(1));
             distribution[cat].avg_carbs = Number((distribution[cat].carbs / count).toFixed(1));
         });
 
-        // 4. Protein Efficiency (Top 10 & Bottom 10)
         const validEfficiency = processedFoods.filter(f => f.protein_efficiency > 0);
         const sortedByEfficiency = [...validEfficiency].sort((a, b) => b.protein_efficiency - a.protein_efficiency);
         const top10Efficiency = sortedByEfficiency.slice(0, 10);
         const bottom10Efficiency = sortedByEfficiency.slice(-10).reverse();
 
-        // 5. Karakteristik Makanan Tertinggi/Terendah Kalori (Berdasarkan Quartile)
         const sortedByTotalNutrisi = [...processedFoods].sort((a, b) => a.total_nutrisi - b.total_nutrisi);
         const q1Index = Math.floor(sortedByTotalNutrisi.length * 0.25);
         const q3Index = Math.floor(sortedByTotalNutrisi.length * 0.75);
@@ -133,7 +118,6 @@ exports.getDsInsights = async (req, res) => {
         const terendahKalori = [...rendahNutrisi].sort((a, b) => a.calories - b.calories).slice(0, 5);
         const tertinggiKalori = [...tinggiNutrisi].sort((a, b) => b.calories - a.calories).slice(0, 5);
 
-        // Kirim hasil akhir ke Frontend React
         return res.status(200).json({
             status: 'success',
             data: {

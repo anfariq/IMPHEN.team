@@ -4,17 +4,13 @@ const getWibDate = () => {
     return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 };
 
-// Fungsi ini menghitung ulang total kalori dan air hari ini, lalu menyimpannya ke daily_summaries
-// --- HELPER: Pengganti DailySummaryService (Versi Lengkap dengan Makro Nutrisi) ---
 const updateDailySummary = async (userId) => {
     try {
         const today = getWibDate();
         
-        // PERBAIKAN: Set boundaries dengan offset +07:00 (WIB)
         const startOfToday = `${today}T00:00:00.000+07:00`;
         const endOfToday = `${today}T23:59:59.999+07:00`;
 
-        // 1. Hitung Kalori Masuk & Makro Nutrisi (Join dengan tabel foods)
         const { data: foods } = await supabase
             .from('user_food_intakes')
             .select('total_calories, qty_grams, food:foods(protein, carbs, fat)')
@@ -27,14 +23,12 @@ const updateDailySummary = async (userId) => {
         (foods || []).forEach(item => {
             caloriesIn += (item.total_calories || 0);
             if (item.food) {
-                // Rumus: (nutrisi * gram / 100) -> Dibulatkan
                 totalProtein += (item.food.protein * item.qty_grams / 100);
                 totalCarbs += (item.food.carbs * item.qty_grams / 100);
                 totalFat += (item.food.fat * item.qty_grams / 100);
             }
         });
 
-        // 2. Hitung total Air Minum
         const { data: waters } = await supabase
             .from('user_water_intakes')
             .select('water')
@@ -44,7 +38,6 @@ const updateDailySummary = async (userId) => {
         
         const totalWater = (waters || []).reduce((sum, item) => sum + (item.water || 0), 0);
 
-        // 3. Hitung total Kalori Keluar (Olahraga)
         const { data: activities } = await supabase
             .from('user_activity_burns')
             .select('calories_burned')
@@ -54,7 +47,6 @@ const updateDailySummary = async (userId) => {
         
         const caloriesOut = (activities || []).reduce((sum, item) => sum + (item.calories_burned || 0), 0);
 
-        // 4. Upsert ke daily_summaries
         const summaryData = {
             calories_in: Math.round(caloriesIn),
             calories_out: Math.round(caloriesOut),
@@ -81,7 +73,6 @@ const updateDailySummary = async (userId) => {
     }
 };
 
-// --- ENDPOINT MAKANAN ---
 exports.storeFood = async (req, res) => {
     try {
         const { food_id, qty_grams, total_calories, consumed_at } = req.body;
@@ -105,7 +96,6 @@ exports.storeFood = async (req, res) => {
 
         if (error) throw error;
 
-        // Panggil helper di background (tanpa 'await')
         updateDailySummary(user.id);
 
         return res.status(201).json({ status: 'success', data: intake });
@@ -114,7 +104,6 @@ exports.storeFood = async (req, res) => {
     }
 };
 
-// --- ENDPOINT AIR MINUM ---
 exports.storeWater = async (req, res) => {
     try {
         const { water } = req.body;
@@ -136,7 +125,6 @@ exports.storeWater = async (req, res) => {
 
         if (error) throw error;
 
-        // Panggil helper di background (tanpa 'await')
         updateDailySummary(user.id);
 
         return res.status(201).json({
