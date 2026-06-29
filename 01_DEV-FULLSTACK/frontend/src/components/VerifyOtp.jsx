@@ -56,7 +56,7 @@ export default function VerifyOtp() {
         try {
             setLoading(true);
 
-            const res = await fetch("https://imphenteam-production.up.railway.app/api/verify-otp", {
+            const res = await fetch("https://expressBack.ownspace.my.id/api/verify-otp", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,7 +122,7 @@ export default function VerifyOtp() {
     const handleResend = async () => {
         try {
             setResending(true);
-            const res = await fetch("https://imphenteam-production.up.railway.app/api/resend-otp", {
+            const res = await fetch("https://expressBack.ownspace.my.id/api/resend-otp", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
