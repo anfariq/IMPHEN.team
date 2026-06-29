@@ -36,7 +36,7 @@ export default function ResetPassword() {
     setError(null);
 
     try {
-      const response = await fetch("https://imphenteam-production.up.railway.app/api/reset-password", {
+      const response = await fetch("https://expressBack.ownspace.my.id/api/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
