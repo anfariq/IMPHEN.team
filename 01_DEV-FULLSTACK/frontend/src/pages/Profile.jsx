@@ -71,7 +71,7 @@ export default function Profile() {
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        fetch("https://imphenteam-production.up.railway.app/api/profile", {
+        fetch("https://expressBack.ownspace.my.id/api/profile", {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Accept': 'application/json',
@@ -109,7 +109,7 @@ export default function Profile() {
 
         try {
             setIsDeleting(true);
-            const res = await fetch("https://imphenteam-production.up.railway.app/api/user/delete", {
+            const res = await fetch("https://expressBack.ownspace.my.id/api/user/delete", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -142,7 +142,7 @@ export default function Profile() {
         setSaving(true);
 
         try {
-            const response = await fetch("https://imphenteam-production.up.railway.app/api/profile", {
+            const response = await fetch("https://expressBack.ownspace.my.id/api/profile", {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
