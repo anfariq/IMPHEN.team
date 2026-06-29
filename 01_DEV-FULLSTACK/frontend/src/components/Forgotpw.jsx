@@ -13,7 +13,7 @@ export default function ForgotPassword() {
     setError(null);
 
     try {
-      const response = await fetch("https://imphenteam-production.up.railway.app/api/forgot-password", {
+      const response = await fetch("https://expressBack.ownspace.my.id/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
