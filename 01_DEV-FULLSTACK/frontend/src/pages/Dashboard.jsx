@@ -242,10 +242,10 @@ export default function Dashboard() {
 
     try {
       const [dashRes, recordsRes, insightsRes, recRes] = await Promise.all([
-        fetch("https://imphenteam-production.up.railway.app/api/dashboard", { headers: headersObj }).then(r => r.json()),
+        fetch("https://expressBack.ownspace.my.id/api/dashboard", { headers: headersObj }).then(r => r.json()),
         apiGet("/activities/record", token).catch(() => []),
-        fetch("https://imphenteam-production.up.railway.app/api/insights", { headers: headersObj }).then(r => r.json()).catch(() => null),
-        fetch("https://imphenteam-production.up.railway.app/api/ml/daily-recommendation", {
+        fetch("https://expressBack.ownspace.my.id/api/insights", { headers: headersObj }).then(r => r.json()).catch(() => null),
+        fetch("https://expressBack.ownspace.my.id/api/ml/daily-recommendation", {
           method: "POST",
           headers: headersObj
         }).then(r => r.json()).catch(() => null)
