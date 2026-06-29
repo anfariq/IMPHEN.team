@@ -26,7 +26,7 @@ const FoodPredictor = ({ onSuccess }) => {
 
     const fetchFoods = async () => {
         try {
-            const res = await axios.get(`https://imphenteam-production.up.railway.app/api/foods/search?q=${search}`, {
+            const res = await axios.get(`https://expressBack.ownspace.my.id/api/foods/search?q=${search}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -59,7 +59,7 @@ const FoodPredictor = ({ onSuccess }) => {
 
             const payload = { protein: p, lemak: l, karbohidrat: k, total_nutrisi: p + l + k, gram: g };
 
-            const res = await axios.post('https://imphenteam-production.up.railway.app/api/ml/predict-calories', payload, {
+            const res = await axios.post('https://expressBack.ownspace.my.id/api/ml/predict-calories', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
@@ -83,7 +83,7 @@ const FoodPredictor = ({ onSuccess }) => {
     const saveToIntake = async (foodId, qty, calories) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post('https://imphenteam-production.up.railway.app/api/food-intake', {
+            await axios.post('https://expressBack.ownspace.my.id/api/food-intake', {
                 food_id: foodId, qty_grams: qty, total_calories: calories, consumed_at: new Date().toISOString()
             }, {
                 headers: { 
@@ -135,7 +135,7 @@ const FoodPredictor = ({ onSuccess }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post("https://imphenteam-production.up.railway.app/api/ml/predict-image", formData, {
+            const response = await axios.post("https://expressBack.ownspace.my.id/api/ml/predict-image", formData, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "x-api-key": "WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ==",
@@ -170,7 +170,7 @@ const FoodPredictor = ({ onSuccess }) => {
         setWaterLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('https://imphenteam-production.up.railway.app/api/water', { water: calculatedGlasses }, {
+            await axios.post('https://expressBack.ownspace.my.id/api/water', { water: calculatedGlasses }, {
                 headers: { 
                     Authorization: `Bearer ${token}`,
                     'x-api-key': 'WVRKV2JXRlhNV2hqTWxab1kyMVdjbGxZU214aGVsRXhZVEpXZVZwWE5HcGpNMVo1V1ZkS2FHVlhSbkphV0Vwc1ltMUtjR0pIUm1oYVIwWnlXbGRhY0E9PQ=='
