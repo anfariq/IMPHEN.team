@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://imphenteam-production.up.railway.app/api',
+  baseURL: 'https://expressBack.ownspace.my.id/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
